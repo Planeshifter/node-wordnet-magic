@@ -24,6 +24,7 @@
   "homepage": "https://github.com/Planeshifter/wordnet-magic",
   "dependencies": {
     "bluebird": "^2.2.2",
-    "sqlite3": "^2.2.4"
+    "sqlite3": "^2.2.4",
+    "underscore": "^1.6.0"
   }
 }

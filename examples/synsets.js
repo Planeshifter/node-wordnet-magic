@@ -3,12 +3,14 @@ var wordNet = require("../src/index.js");
 var bank = new wordNet.Word("bank");
 
 // using Promises
-bank.getSynsets().each(function(elem){
+// get all synsets of bank which are nouns
+bank.getSynsets("n").each(function(elem){
 	console.log(elem);
 });
 
-// using classic node.js callbacks
-bank.getSynsets(function(err, data){
+// using classic node.js callbacks, retrieve
+// only synsets for verbs
+bank.getSynsets("v",function(err, data){
 	data.forEach(function(elem){
 		console.log(elem);
 	})
