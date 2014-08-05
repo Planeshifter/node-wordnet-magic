@@ -19,6 +19,10 @@ console.log(data);
 
 var wn = {};
 
+wn.registerDatabase = function(path){
+	db = Promise.promisifyAll(new sqlite3.Database(path));
+}
+
 wn.Word = function(str, pos){
   this.lemma = str;
   if (pos){

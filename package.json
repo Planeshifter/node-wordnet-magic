@@ -1,0 +1,29 @@
+{
+  "name": "wordnet-magic",
+  "version": "0.0.0",
+  "description": "tools for working with Princeton's lexical database WordNet",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Planeshifter/wordnet-magic"
+  },
+  "keywords": [
+    "WordNet",
+    "semantic-web",
+    "NLP",
+    "lexical-database"
+  ],
+  "author": "Philipp Burckhardt",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Planeshifter/wordnet-magic/issues"
+  },
+  "homepage": "https://github.com/Planeshifter/wordnet-magic",
+  "dependencies": {
+    "bluebird": "^2.2.2",
+    "sqlite3": "^2.2.4"
+  }
+}
