@@ -7,11 +7,45 @@ var _ = require('underscore');
 // initialize standard path
 var db = Promise.promisifyAll(new sqlite3.Database('../data/sqlite-31.db'));
 
+
+// extend prototype objects
+
+// String
 if (!String.prototype.hasOwnProperty("repeat")){
-String.prototype.repeat = function(num){
+  String.prototype.repeat = function(num){
     return new Array( num + 1 ).join( this );
   }
 }
+
+if (!String.prototype.hasOwnProperty("endsWith")){
+  String.prototype.endsWith = function(str){
+    var myRegExp = new RegExp(str + "$"); 
+    return myRegExp.test(this);
+  }
+}
+
+
+// Array
+if (!Array.prototype.hasOwnProperty("pick")){
+	Array.prototype.pick = function(name){
+		return this.map(function(elem){
+			return elem[name];
+		});
+	}
+}
+
+if (!Array.prototype.hasOwnProperty("contains")){
+	Array.prototype.contains = function(elem){
+		for (var q = 0; q < this.length; q++){
+	      if (elem == this[q]) {
+	        return true;
+	      }
+	    }
+		return false;	
+	}
+}
+
+// wordNet package namespace
 
 var wn = {};
 
@@ -38,7 +72,7 @@ wn.MORPHY_SUBSTITUTIONS = {
 	       { suffix: 'ed', ending: 'e'}, 
 	       { suffix: 'ed', ending: ''},  
 	       { suffix: 'ing', ending: 'e'},
-	       { suffix: 'ing', ending: ''}],       
+	       { suffix: 'ing', ending: ''}],  
 		  ADJECTIVE:
 	      [{ suffix: 'er', ending: ''},
 	       { suffix: 'est', ending: ''}, 
@@ -46,77 +80,161 @@ wn.MORPHY_SUBSTITUTIONS = {
 	       { suffix: 'est', ending: 'e'}]
 		};
 
-wn.morph = function(input_str, pos, callback){
+
+wn.morphy = function(input_str, pos, callback){
+	return wn.morphyPromise(input_str, pos).nodeify(callback);
+}
+
+wn.morphyPromise = function(input_str, pos){
 	
+	if(!pos){
+	  var arr = ["n","v","a","r","s"];
+	  var resArray = [];
+	  for (var i = 0; i <= 4; i++){
+	    resArray.push(wn.morphyPromise(input_str, arr[i]));
+	} 
+	return Promise.all(resArray).then(function(data){
+	  var reducedArray = [];
+	  for (var i = 0; i < data.length; i++){
+		  var current = data[i];
+		  reducedArray.push(current);
+	  }
+	  return _.flatten(reducedArray);
+	})
+	}
+
 	var substitutions;
 	switch(pos){
 	  case "n":
-	    substitutions = wn.MORPHY_SUBSTITUTIONS.NOUN;
+	    substitutions = _.clone(wn.MORPHY_SUBSTITUTIONS.NOUN);
 	  break;
 	  case "v":
-	    substitutions = wn.MORPHY_SUBSTITUTIONS.VERB;
+	    substitutions = _.clone(wn.MORPHY_SUBSTITUTIONS.VERB);
 	  break;
 	  case "a":
-	    substitutions = wn.MORPHY_SUBSTITUTIONS.ADJECTIVE;
+	    substitutions = _.clone(wn.MORPHY_SUBSTITUTIONS.ADJECTIVE);
 	  break;
 	  default:
 	    substitutions = [];
 	}
 	
-	if (!wn.dbDictionaryPromise){
-	  var query = "SELECT lemma FROM words";
-	  wn.dbDictionaryPromise = db.allAsync(query);
+	if (!wn.DICTIONARY){
+	  var query = "SELECT DISTINCT ws.lemma AS lemma, syn.pos AS pos FROM words AS ws LEFT JOIN senses AS sen ON ws.wordid = sen.wordid LEFT JOIN ";
+	  query += "synsets AS syn ON sen.synsetid = syn.synsetid"
+	  wn.DICTIONARY = db.allAsync(query).map(function(elem){
+		    var obj = {};
+		    obj.lemma = elem.lemma;
+		    obj.pos = elem.pos;
+			return obj;
+		});
 	}
 	
-	var wordsPromise = wn.dbDictionaryPromise.then(function(data){
-		var dictionary = data.map(function(elem){
-			return elem.lemma;
-		});
+	if (!wn.EXCEPTIONS){
+	  var query2 = "SELECT lemma, morph, pos FROM morphology";
+	  wn.EXCEPTIONS = db.allAsync(query2);
+	}
+	
+	var wordsPromise = Promise.join(wn.DICTIONARY, wn.EXCEPTIONS, function(dictionary, exceptions){
 		
 		function rulesOfDetachment(word, substitutions){
 		  var result = [];
-		  if (_.contains(dictionary, word)){
-			  result.push(word);
-		  }
+
+		  dictionary.filter(function(elem){
+			  return elem.lemma === word;
+		  }).forEach(function(elem){
+			if (elem.pos === pos){
+			  var obj = new wn.Word(elem.lemma);			    
+			  obj.part_of_speech = elem.pos;
+		      result.push(obj);
+			}  
+		  })
+		 	  
 		  for (var i = 0; i < substitutions.length; i++){
 			  
 			  var suffix = substitutions[i].suffix;
 			  var new_ending = substitutions[i].ending;
 			  
-			  var myRegEx = new RegExp(suffix + "$");
-			 
-			  if (myRegEx.test(word) === true){
+			  if (word.endsWith(suffix) === true){
 				  var new_word = word.substring(0, word.length - suffix.length) + new_ending;
-				  var recResult = rulesOfDetachment(new_word, substitutions.splice(i,1));
+				  substitutions.splice(i,1);
+				  if (new_word.endsWith("e") && !word.endsWith("e")){
+				    substitutions.push({suffix: 'e', ending:''});
+				  }
+				  var recResult = rulesOfDetachment(new_word, substitutions);
 				  Array.isArray(recResult) ? result = result.concat(recResult) : result.push(recResult);
 			  }
 		  }
 		  return result;
 		}
 	
-	var query = "SELECT * FROM morphology WHERE morph = $morph AND pos = $pos"
-	var exceptionsPromise = db.allAsync(query,{
-			  $morph: input_str,
-			  $pos: pos
-		  });
-	exceptionsPromise = exceptionsPromise.map(function(elem){
-		  var word = new wn.Word(elem.lemma);
-		  return word;
-	});
+	var found_exceptions = [];
+	var exception_morphs = exceptions.map(function(elem){
+		return elem.morph;
+	})
+
 	
-	return exceptionsPromise.then(function(data){
-		if (data.length > 0){
-			return data;
+	var index = exception_morphs.indexOf(input_str);
+	while(index !== -1){
+		if(exceptions[index].pos === pos){
+			var base_word = new wn.Word(exceptions[index].lemma);
+			base_word.part_of_speech = pos;
+			found_exceptions.push(base_word);
 		}
-		else {
-	     var res2 = rulesOfDetachment(input_str, substitutions);
-	     return res2.map(function(elem){
-	    	 return new wn.Word(elem);
-	     });
-		}
-	})
-	})
-    return wordsPromise.nodeify(callback);
+		
+	var index = exception_morphs.indexOf(input_str, index + 1);
+	}
+	
+	if (found_exceptions.length > 0){
+	  return found_exceptions;
+	}
+	else {
+	  if(pos === "n" && input_str.endsWith("ful")){
+		  suffix = "ful";
+		  input_str = input_str.slice(0, input_str.length - suffix.length);
+	  } else {
+		  suffix = "";
+	  }
+	  return rulesOfDetachment(input_str, substitutions);
+	}
+	});
+    return wordsPromise;
+};
+
+wn.isVerb = function(str, callback){
+	var word = wn.morphyPromise(str);
+	var res = word.then(function(data){
+      var posArray = data.pick("part_of_speech");
+	  return posArray.contains("v");
+	});
+	return res.nodeify(callback);
+};
+
+wn.isNoun = function(str, callback){
+	var word = wn.morphyPromise(str);
+	var res = word.then(function(data){
+      var posArray = data.pick("part_of_speech");
+	  return posArray.contains("n");
+	});
+	return res.nodeify(callback);
+};
+
+wn.isAdjective = function(str, callback){
+	var word = wn.morphyPromise(str);
+	var res = word.then(function(data){
+		console.log(data)
+      var posArray = data.pick("part_of_speech");
+	  return posArray.contains("a") || posArray.cotains("s");
+	});
+	return res.nodeify(callback);
+};
+
+wn.isAdverb = function(str, callback){
+	var word = wn.morphyPromise(str);
+	var res = word.then(function(data){
+      var posArray = data.pick("part_of_speech");
+	  return posArray.contains("r");
+	});
+	return res.nodeify(callback);
 };
 
 wn.Word = function(str){
