@@ -1,6 +1,6 @@
-var wordNet = require("../src/index.js");
+var wn = require("../src/index.js");
 
-var dog = new wordNet.Word("dog");
+var dog = new wn.Word("dog");
 
 // using Promises
 dog.getSynsets().then(function(synsetArray){
@@ -11,3 +11,7 @@ dog.getSynsets().then(function(synsetArray){
 		console.log(word);
 	});
 });
+
+wn.fetchSynset("dog.n.1", function(err, synset){
+	synset.getLemmas(function(err, data){ console.log(data) });
+})

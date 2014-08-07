@@ -7,7 +7,6 @@ white.getAntonyms().then(function(synsetArray){
 });
 
 var high = new wordNet.Word("high");
-
 high.getAntonyms().then(function(antonymArray){
 	console.log(antonymArray);
 })

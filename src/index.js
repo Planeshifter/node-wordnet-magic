@@ -245,16 +245,18 @@ wn.isAdverb = function(str, callback){
 	return res.nodeify(callback);
 };
 
-wn.Word = function(str){
+wn.Word = function(str, pos){
   this.lemma = str;
-  this.part_of_speech = null;
+  if (pos){
+    this.part_of_speech = pos;  
+  }
 };
 
 wn.Word.prototype = {
   constructor: wn.Word,
-  getSynsets: function(pos, callback){
+  getSynsets: function(callback){
 	var self = this;
-	self.part_of_speech = pos || self.part_of_speech; 
+	self.part_of_speech = self.part_of_speech || null; 
 	
 	function _findSynsetsArray(word){
 	  return _findWordId(word).then(_findSynsetsFromId);
@@ -308,10 +310,10 @@ wn.Word.prototype = {
     });
     return promise.nodeify(callback);
   },
-  getAntonyms: function(pos, callback){
+  getAntonyms: function(callback){
 	  
 	var self = this;
-	self.part_of_speech = pos || self.part_of_speech;
+	self.part_of_speech = self.part_of_speech || null;
 	var word = this.lemma;
 	
 	function _formAntonymsArray(synsetid){
@@ -372,26 +374,69 @@ wn.Word.prototype = {
   },
 };
 
+wn.fetchSynset = function(identifier, callback){
+	 
+  var inputs = identifier.split(".");
+  var query = "SELECT s.synsetid AS synsetid, s.definition AS definition, s.pos AS pos, l.lexdomainname AS lexdomain FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid ";
+  query += "WHERE s.pos = $pos AND s.lemma = $lemma AND s.sensenum = $sensenum";
+	  
+  var ret = db.eachAsync(query,{
+    $lemma: inputs[0],
+    $pos: inputs[1],
+    $sensenum: inputs[2]
+   });
+	   
+   return ret.then(_appendLemmas).then(function(data){
+     return new wn.Synset(data);	   
+   }).nodeify(callback);
+}
+
 // Synset Class
 wn.Synset = function(obj){
-  this.synsetid = obj.synsetid;
-  this.words = obj.words;
-  this.definition = obj.definition;
-  this.pos = obj.pos;
-  this.lexdomain = obj.lexdomain;
-  
-  if(obj.hypernym){
-    this.hypernym = obj.hypernym;
-  }
-  
-  if(obj.hyponym){
-	  this.hyponym = obj.hyponym;
-  }
-  
+	  this.synsetid = obj.synsetid;
+	  this.words = obj.words;
+	  this.definition = obj.definition;
+	  this.pos = obj.pos;
+	  this.lexdomain = obj.lexdomain;
+	  
+	  if(obj.hypernym){
+	    this.hypernym = obj.hypernym;
+	  }
+	  
+	  if(obj.hyponym){
+		  this.hyponym = obj.hyponym;
+	  }
+	  
+	  if(obj.holonymOf){
+		  this.holonymOf = obj.holonymOf;
+	  }
 };
 
 wn.Synset.prototype = {
 		  constructor: wn.Synset,
+		  fetchSynset: function(callback){
+			  var inputs = obj.split(".");
+			  
+			  var query = "SELECT s.synsetid, s.definition, s.pos,l.lexdomainname AS lexdomain FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid";
+			  query += "WHERE s.pos = $pos AND s.lemma = $lemma AND s.sensenum = $sensenum";
+			  
+			  var ret = db.eachAsync(query,{
+				   $lemma: inputs[0],
+				   $pos: inputs[1],
+				   $sensenum: inputs[2]
+				 });
+			  
+			  ret.then(function(data){
+				  this.synsetid = data.synsetid;
+				  this.definition = data.definition;
+				  this.pos = data.pos;
+				  this.lexdomain = data.lexdomain;
+				  
+				  callback
+			  })	
+			  
+			  fetched = true;
+		  },
 		  getExamples: function(callback){
 			  var promise = _findSamplesArray(this.synsetid).map(function(item){
 				return new wn.Example(item);  
@@ -454,22 +499,6 @@ wn.Synset.prototype = {
 			  });
 			  return promise.nodeify(callback);
 		  },
-		  getHolonymsTree: function(callback){
-			  var counter = 0;
-			  function getHolonymFromId(input){
-				  return _findHolonymsArray(input).map(_appendLemmas).map(function(item){
-					  var obj = new wn.Synset(item);
-					  if (counter < 20)
-					  {
-					  obj.holonymOf = getHolonymFromId(obj.synsetid);
-					  counter++;
-					  }
-					  return Promise.props(obj);
-				  });
-			  };
-              var promise = getHolonymFromId(this.synsetid);
-			  return promise.nodeify(callback);
-		  },
 		  getSisterTerms: function(callback){
 			  var promise = _findSisterTermsArray(this.synsetid).map(_appendLemmas).map(function(item){
 				  return new wn.Synset(item);
@@ -503,6 +532,11 @@ wn.Example.prototype = {
 
 wn.print = function(obj){
 	switch(obj.constructor){
+	case Array: 
+		for (var i = 0; i < obj.length; i++){
+			wn.print(obj[i]);
+		}
+	break;
 	case wn.Synset:
 		function getSynsetString(input, depth){
 		  var current_depth = depth + 1;
@@ -517,6 +551,7 @@ wn.print = function(obj){
 		  var str = "S: (" + input.pos + ") ";
 		  str += words.join(", ");
 		  str += " (" + input.definition + ")";
+		  
 		  if(input.hypernym)
 			  {
 			  if(Array.isArray(input.hypernym)){
@@ -530,19 +565,6 @@ wn.print = function(obj){
 			    str += "  " + getSynsetString(input.hypernym, current_depth);  
 			    }
 			  }
-		  if(input.holonym)
-		  {
-		    if(Array.isArray(input.holonym)){
-			    input.holonym.forEach(function(elem){
-				  var space = String(" ");
-				  var times = current_depth * 4;
-				  var spaces = space.repeat(times);
-		          str += "\n" + spaces + getSynsetString(elem, current_depth);
-			    });
-		  } else {
-			     str += "  " + getSynsetString(input.hypernym, current_depth);  
-			     }
-	      }
 		  if(input.hyponym)
 		  {
 		    if(Array.isArray(input.hyponym)){

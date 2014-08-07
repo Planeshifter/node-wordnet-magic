@@ -12,11 +12,11 @@ or a member of, the whole. That is,
  According to WordNet, 'bark' is a holonym of 'root', of 'trunk' and of 'branch.':
  */
 
-var wordNet = require("../src/index.js");
+var wn = require("../src/index.js");
 var util = require("util");
-var bark = new wordNet.Word("horsemeat");
 
-// get Holonyms:
+// get Holonym tree for bark:
+var bark = new wn.Word("bark");
 bark.getSynsets().then(function(synsetArray){
     console.log("We wish to retrieve the holonyms for the synset with the definition:");
     console.log(synsetArray[0].definition);
@@ -26,4 +26,12 @@ bark.getSynsets().then(function(synsetArray){
 });
 
 
+//get Holonym tree for word
+
+wn.fetchSynset("lock.n.1", function(err, synset){
+	synset.getHolonymsTree(function(err, data){ 
+      console.log(util.inspect(data, null, 1)); 
+	  wn.print(data) 
+      });
+})
 
