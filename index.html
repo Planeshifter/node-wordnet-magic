@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Node-wordnet-magic by Planeshifter</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Node-wordnet-magic</h1>
+          <h2>tools for working with Princeton&#39;s lexical database WordNet</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/Planeshifter/node-wordnet-magic/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/Planeshifter/node-wordnet-magic/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/Planeshifter/node-wordnet-magic" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a name="node-wordnet-magic" class="anchor" href="#node-wordnet-magic"><span class="octicon octicon-link"></span></a>node-wordnet-magic</h1>
+
+<p>A node.js module for working with Princeton's WordNet lexical database for the English language.</p>
+
+<p><a href="http://badge.fury.io/js/wordnet-magic"><img src="https://badge.fury.io/js/wordnet-magic.svg" alt="NPM version"></a>
+<a href="http://travis-ci.org/Planeshifter/wordnet-magic"><img src="https://secure.travis-ci.org/Planeshifter/wordnet-magic.png" alt="build status"></a></p>
+
+<h1>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting Started</h1>
+
+<h2>
+<a name="what-is-it-about" class="anchor" href="#what-is-it-about"><span class="octicon octicon-link"></span></a>What is it about?</h2>
+
+<h2>
+<a name="installation--setup" class="anchor" href="#installation--setup"><span class="octicon octicon-link"></span></a>Installation &amp; Setup</h2>
+
+<p>The module is available through npm via</p>
+
+<pre><code>npm install wordnet-magic
+</code></pre>
+
+<p>Inside node, the package can then be loaded as any other module:</p>
+
+<pre><code>var wn = require('wordnet-magic');
+</code></pre>
+
+<p>However, the WordNet database has to be downloaded seperately and placed into the /data folder of the package directory. The package expects WordNet in SQLite format, which can be obtained from the URL 
+<a href="http://sourceforge.net/projects/wnsql/files/wnsql3/sqlite/">http://sourceforge.net/projects/wnsql/files/wnsql3/sqlite/</a>. If for whatever reason you decide to place
+the database file in another location, you have to tell the module as follows before using any of the other functions:</p>
+
+<pre><code>wn.registerDatabase(&lt;insert path here&gt;);
+</code></pre>
+
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<h2>
+<a name="example-usage" class="anchor" href="#example-usage"><span class="octicon octicon-link"></span></a>Example Usage</h2>
+
+<h1>
+<a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h1>
+
+<h2>
+<a name="word" class="anchor" href="#word"><span class="octicon octicon-link"></span></a>Word</h2>
+
+<h2>
+<a name="morphy" class="anchor" href="#morphy"><span class="octicon octicon-link"></span></a>Morphy</h2>
+
+<h3>
+<a name="wnmorphy" class="anchor" href="#wnmorphy"><span class="octicon octicon-link"></span></a>wn.morphy()</h3>
+
+<h2>
+<a name="word-type-checking" class="anchor" href="#word-type-checking"><span class="octicon octicon-link"></span></a>Word type checking</h2>
+
+<h3>
+<a name="wnisnoun" class="anchor" href="#wnisnoun"><span class="octicon octicon-link"></span></a>wn.isNoun()</h3>
+
+<h3>
+<a name="wnisverb" class="anchor" href="#wnisverb"><span class="octicon octicon-link"></span></a>wn.isVerb()</h3>
+
+<h3>
+<a name="wnisadjective" class="anchor" href="#wnisadjective"><span class="octicon octicon-link"></span></a>wn.isAdjective()</h3>
+
+<h3>
+<a name="wnisadverb" class="anchor" href="#wnisadverb"><span class="octicon octicon-link"></span></a>wn.isAdverb()</h3>
+
+<h2>
+<a name="synset" class="anchor" href="#synset"><span class="octicon octicon-link"></span></a>Synset</h2>
+
+<h3>
+<a name="methods" class="anchor" href="#methods"><span class="octicon octicon-link"></span></a>Methods</h3>
+
+<h4>
+<a name="getexamples" class="anchor" href="#getexamples"><span class="octicon octicon-link"></span></a>.getExamples()</h4>
+
+<h4>
+<a name="getlemmas" class="anchor" href="#getlemmas"><span class="octicon octicon-link"></span></a>.getLemmas()</h4>
+
+<h4>
+<a name="gethypernyms" class="anchor" href="#gethypernyms"><span class="octicon octicon-link"></span></a>.getHypernyms()</h4>
+
+<h4>
+<a name="gethypernymstree" class="anchor" href="#gethypernymstree"><span class="octicon octicon-link"></span></a>.getHypernymsTree()</h4>
+
+<h4>
+<a name="gethyponyms" class="anchor" href="#gethyponyms"><span class="octicon octicon-link"></span></a>.getHyponyms()</h4>
+
+<h4>
+<a name="getgethyponymstree" class="anchor" href="#getgethyponymstree"><span class="octicon octicon-link"></span></a>.getgetHyponymsTree()</h4>
+
+<h4>
+<a name="getholonyms" class="anchor" href="#getholonyms"><span class="octicon octicon-link"></span></a>.getHolonyms()</h4>
+
+<h4>
+<a name="getholonymstree" class="anchor" href="#getholonymstree"><span class="octicon octicon-link"></span></a>.getHolonymsTree()</h4>
+
+<h4>
+<a name="getsisterterms" class="anchor" href="#getsisterterms"><span class="octicon octicon-link"></span></a>.getSisterTerms()</h4>
+
+<h4>
+<a name="causeof" class="anchor" href="#causeof"><span class="octicon octicon-link"></span></a>.causeOf()</h4>
+        </section>
+
+        <footer>
+          Node-wordnet-magic is maintained by <a href="https://github.com/Planeshifter">Planeshifter</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
