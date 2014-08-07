@@ -12,7 +12,7 @@ wordNet.isVerb("kill", function(err, res){
 
 wordNet.isNoun("tiger").then(console.log);
 
-wordNet.isNoun("filthy").then(console.log);
+wordNet.isNoun("happy").then(console.log);
 
 wordNet.isAdjective("filthy").then(console.log);
 

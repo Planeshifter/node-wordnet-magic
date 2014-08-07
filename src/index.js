@@ -230,9 +230,8 @@ wn.isNoun = function(str, callback){
 wn.isAdjective = function(str, callback){
 	var word = wn.morphyPromise(str);
 	var res = word.then(function(data){
-		console.log(data)
       var posArray = data.pick("part_of_speech");
-	  return posArray.contains("a") || posArray.cotains("s");
+	  return posArray.contains("a") || posArray.contains("s");
 	});
 	return res.nodeify(callback);
 };
