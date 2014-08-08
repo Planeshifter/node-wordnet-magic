@@ -631,7 +631,30 @@ Output:
          words: [ { lemma: 'queen' } ] } ] } ]
 ``` 
 
-#### .causeOf()
+#### .causeOf(callback)
+
+Defined for two verbs X and Y, where X causes the action of Y. The result set is an array consisting of the 
+synset(s) which are caused by the synset this method belongs to. 
+
+Example:
+
+```
+wn.fetchSynset("leak.v.1",function(err, synset){
+	synset.causeOf(function(err, data){
+		console.log(data)
+	});
+})
+```
+
+Output:
+
+```
+[ { synsetid: 200938019,
+    words: [ [Object], [Object], [Object] ],
+    definition: 'be released or become known; of news',
+    pos: 'v',
+    lexdomain: 'verb.communication' } ]
+```
 
 ### Other Functions
 
