@@ -372,6 +372,15 @@ wn.Word.prototype = {
     var promise =  _findSynsetsArray(this.lemma).then(_formAntonymsArray);
     return promise.nodeify(callback);
   },
+  getPolysemyCount: function(pos, callback){
+	  this.part_of_speech = pos;  
+	  var synsetArrayProm = this.getSynsets();
+	  synsetArrayProm = synsetArrayProm.then(function(array){
+		 var polysemy_count = array.length;
+		 return polysemy_count;
+	  });
+	  return synsetArrayProm.nodeify(callback)
+  },
 };
 
 wn.fetchSynset = function(identifier, callback){
@@ -409,6 +418,14 @@ wn.Synset = function(obj){
 	  
 	  if(obj.holonymOf){
 		  this.holonymOf = obj.holonymOf;
+	  }
+	  
+	  if(obj.domain_type){
+		  this.domain_type = obj.domain_type;
+	  }
+	  
+	  if(obj.term_type){
+		  this.term_type = obj.term_type;
 	  }
 };
 
@@ -449,13 +466,13 @@ wn.Synset.prototype = {
 			})  
 			return promise.nodeify(callback);
 		  },
-		  getHypernyms: function(callback){
+		  getHypernym: function(callback){
 			  var promise = _findHypernymsArray(this.synsetid).map(_appendLemmas).map(function(item){
 				   return new wn.Synset(item);
 			  });
 			  return promise.nodeify(callback);			  
 		  },
-		  getHypernymsTree: function(callback){
+		  getHypernymTree: function(callback){
 			function getHypernymFromId(input){
 				return _findHypernymsArray(input).map(_appendLemmas).map(function(item){
 					item.hypernym = getHypernymFromId(item.synsetid);
@@ -485,6 +502,7 @@ wn.Synset.prototype = {
 			  function getHyponymsFromId(input){
 				  return _findHyponymsArray(input).map(_appendLemmas).map(function(item){
 					  item.hyponym = getHyponymsFromId(item.synsetid);
+					  return Promise.props(item);
 				  }).map(function(item){
 					 var obj = new wn.Synset(item);
 					 return obj;
@@ -513,6 +531,76 @@ wn.Synset.prototype = {
 		  },
 		  causeOf: function(callback){
 			  var promise = _findCauseOfArray(this.synsetid).map(_appendLemmas).map(function(item){
+				  return new wn.Synset(item);
+			  });
+			  return promise.nodeify(callback);
+		  },
+		  getDomains: function(callback){
+			  
+			  var classification;
+			  
+			  function _findDomainsArray(synsetid){
+					var query = "SELECT synset2id, linkid FROM semlinks WHERE synset1id = $synset1id AND linkid IN (91, 93, 95)";
+					var arr = db.allAsync(query, {
+						$synset1id: synsetid
+					});
+					return arr.map(function(data){
+						var obj = {};
+						obj.synsetid = data.synset2id; 
+					    
+						switch(data.linkid){
+						  case 91: 
+						    classification = "topic";
+						  break;
+						  case 93: 
+							classification = "region";
+						  break;
+						  case 95: 
+						    classification = "usage";
+						  break;
+						}
+							
+						return _findSynsetDefFromId(obj);
+					})
+				}
+			  
+			  var promise = _findDomainsArray(this.synsetid).map(_appendLemmas).map(function(item){
+				  item.domain_type = classification;
+				  return new wn.Synset(item);
+			  });
+			  return promise.nodeify(callback);
+		  },
+		  getDomainTerms: function(callback){
+			  
+			  var classification;
+			  
+			  function _findDomainTermsArray(synsetid){
+					var query = "SELECT synset1id, linkid FROM semlinks WHERE synset2id = $synset2id AND linkid IN (92, 94, 96)";
+					var arr = db.allAsync(query, {
+						$synset2id: synsetid
+					});
+				    console.log("drin")
+					return arr.map(function(data){
+						var obj = {};
+						obj.synsetid = data.synset1id; 
+						switch(data.linkid){
+						  case 92: 
+						    classification = "topic";
+						  break;
+						  case 94: 
+							classification = "region";
+						  break;
+						  case 96: 
+						    classification = "usage";
+						  break;
+						}
+						
+					return _findSynsetDefFromId(obj);
+					})
+				}
+			  
+			  var promise = _findDomainTermsArray(this.synsetid).map(_appendLemmas).map(function(item){
+				  item.term_type = classification;
 				  return new wn.Synset(item);
 			  });
 			  return promise.nodeify(callback);
@@ -674,9 +762,7 @@ function _findHolonymsArray(synsetid, type){
 	} else {
 	  linkid = "IN (11,13,15)";
 	}
-	console.log(linkid)
 	var query = "SELECT synset1id FROM semlinks WHERE synset2id = $synset2id AND linkid " + linkid;
-	console.log(query)
 	var arr = db.allAsync(query, {
 		$synset2id: synsetid
 	});

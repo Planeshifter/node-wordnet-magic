@@ -1,8 +1,7 @@
 var wn = require("../src/index.js");
 var util = require("util");
 
-wn.fetchSynset("bacteria.n.2",function(err, synset){
-	console.log(synset)
+wn.fetchSynset("leak.v.1",function(err, synset){
 	synset.causeOf(function(err, data){
 		console.log(data)
 	});
