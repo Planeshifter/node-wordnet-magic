@@ -11,6 +11,6 @@ dog.getSynsets().then(function(synsetArray){
 });
 */
 
-wn.fetchSynset("bank.n.2", function(err, synset){
-	synset.getSisterTerms(function(err, data){ console.log(data) });
+wn.fetchSynset("queen.n.7", function(err, synset){
+	synset.getSisterTerms(function(err, data){ console.log(util.inspect(data, null, 5)) });
 })

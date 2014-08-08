@@ -17,18 +17,23 @@ var util = require("util");
 var bark = new wn.Word("bark");
 
 // get Holonyms:
+
+/*
 bark.getSynsets().then(function(synsetArray){
     console.log("We wish to retrieve the holonyms for the synset with the definition:");
     console.log(synsetArray[3].definition);
 	synsetArray[3].getHolonyms().each(function(holonym){
-			console.log(util.inspect(holonym));
+		console.log(util.inspect(holonym));
 		})
 });
+*/
 
 
-// get Holonym for arm
+// get Holonym for ship
 
-wn.fetchSynset("arm.n.1", function(err, synset){
-	synset.getHolonyms(function(err, data){ console.log(util.inspect(data, null, 3))});
+wn.fetchSynset("member.n.1", function(err, synset){
+	console.log(synset)
+	synset.getHolonyms(null, function(err, data){ console.log(util.inspect(data, null, 3)); });
 })
+
 

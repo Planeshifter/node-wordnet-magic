@@ -81,7 +81,7 @@ Invoking the constructor function returns a new object with the following proper
 
 This key holds the user-supplied word passed to the constructor function at creation of the object. 
 
-#### .part_of_speech (optional)
+#### .pos (optional)
 
 If the word was created by passing the constructor function a part-of-speech type, this key will hold the supplied value. Otherwise it is *undefined*.
 
@@ -155,7 +155,7 @@ functionality is important insofar as words are stored only in their base form i
 produce bad results. A detailed explanation of the steps Morphy takes to determine the base form can be found in the original documentation:
 [https://wordnet.princeton.edu/wordnet/man/morphy.7WN.html](https://wordnet.princeton.edu/wordnet/man/morphy.7WN.html)
 
-### wn.morphy(word, pos, callback)
+#### wn.morphy(word, pos, callback)
 Returns the base form for an inflected word to the callback function. As a second argument, the function takes a character denoting the part of speech,
 which can take one of the values *n* for noun, *v* for verb, *a* for adjective, *r* for adverb and *s* for satellite adjective. Internally,
 the function performs different steps depending on the type of the word. If *pos* is not supplied, all five possibilities are checked and the results
@@ -184,7 +184,7 @@ take as their first argument the word in question and as their second argument a
 first use *morphy* to find the base form of the supplied word and then check whether the returned array of objects from *morphy*
 contains an entry of the word type in question.
 
-### wn.isNoun(word, callback)
+#### wn.isNoun(word, callback)
 
 Returns *true* if *word* is a noun, *false* otherwise to the supplied callback.
 
@@ -200,7 +200,7 @@ Output:
 false
 ```
 
-### wn.isVerb(word, callback)
+#### wn.isVerb(word, callback)
 
 Returns *true* if *word* is a verb, *false* otherwise to the supplied callback.
 
@@ -216,7 +216,7 @@ Output:
 true
 ```
 
-### wn.isAdjective(word, callback)
+#### wn.isAdjective(word, callback)
 
 Returns *true* if *word* is a adjective, *false* otherwise to the supplied callback.
 
@@ -232,7 +232,7 @@ Output:
 true
 ```
 
-### wn.isAdverb(word, callback)
+#### wn.isAdverb(word, callback)
 
 Returns *true* if *word* is a adverb, *false* otherwise to the supplied callback.
 
@@ -366,54 +366,155 @@ Output:
 
 #### .getHyponyms(callback)
 
-#### .getgetHyponymsTree(callback)
+#### .getHyponymsTree(callback)
 
-#### .getHolonyms(callback)
+#### .getHolonyms(type, callback)
 
 Returns an array of holonyms for the given synset. Holonyms define the relationship between a part and a whole. Specifically, X is a holonym of Y if the latter is a part of X, for example an arm is part of a human being.
+The function takes as a first argument the type of the holonym relationship, which can be either *part*, *member* or *substance* (or an array combining any two of those). If *null* is supplied, the function
+returns all holonyms. 
 
 Example:
 
 ```
-wn.fetchSynset("word.n.1", function(err, synset){
-	synset.getHolonyms(function(err, data){ 
-    console.log(util.inspect(data, null, 3))
-   });
+wn.fetchSynset("feminist.n.1", function(err, synset){
+	synset.getHolonyms("member", function(err, data){ console.log(util.inspect(data, null, 3)); });
 })
 ``` 
 
 Output:
 
 ```
-[ { synsetid: 106315661,
-    words: [ { lemma: 'syllable'} ],
-    definition: 'a unit of spoken language larger than a phoneme',
+[ { synsetid: 100802082,
+    words: 
+     [ { lemma: 'feminism' },
+       { lemma: 'feminist movement' },
+       { lemma: 'women\'s lib' },
+       { lemma: 'women\'s liberation movement' } ],
+    definition: 'the movement aimed at equal rights for women',
     pos: 'n',
-    lexdomain: 'noun.communication' },
-  { synsetid: 106319039,
-    words: [ { lemma: 'affix' } ],
-    definition: 'a linguistic element added to a word to produce 
-		 an inflected or derived form',
-    pos: 'n',
-    lexdomain: 'noun.communication' } ]
+    lexdomain: 'noun.act' } ]
 ```
 
-#### .getSisterTerms()
+#### .getMeronyms(type, callback)
+
+Meronyms are the opposite of holonyms, i.e. X is a meronym of Y if X is a part of Y. The function takes as a first argument the type of the meronym 
+relationship, which can be either *part*, *member* or *substance* (or an array combining any two of those). If *null* is supplied, the function
+returns all meronyms. The returned object is an array of synsets which are meronyms of the synset owning the method.
 
 Example:
 
 ```
-wn.fetchSynset("bank.n.2", function(err, synset){
-	synset.getSisterTerms(function(err, data){ wn.print(data) });
+wn.fetchSynset("finger.n.1", function(err, synset){
+	synset.getMeronyms("part",function(err, data){ 
+	  console.log(util.inspect(data, null, 3));
+	});
+})
+```
+
+Output: 
+
+```
+[ { synsetid: 102443154,
+    words: [ { lemma: 'pad' } ],
+    definition: 'the fleshy cushion-like underside of an animal\'s foot 
+    or of a human\'s finger',
+    pos: 'n',
+    lexdomain: 'noun.animal' },
+  { synsetid: 105574750,
+    words: [ { lemma: 'fingertip' } ],
+    definition: 'the end (tip) of a finger',
+    pos: 'n',
+    lexdomain: 'noun.body' },
+  { synsetid: 105591915,
+    words: [ { lemma: 'fingernail' } ],
+    definition: 'the nail at the end of a finger',
+    pos: 'n',
+    lexdomain: 'noun.body' },
+  { synsetid: 105592855,
+    words: 
+     [ { lemma: 'knuckle' },
+       { lemma: 'knuckle joint' },
+       { lemma: 'metacarpophalangeal joint' } ],
+    definition: 'a joint of a finger when the fist is closed',
+    pos: 'n',
+    lexdomain: 'noun.body' } ]
+
+```
+
+#### .getSisterTerms(callback)
+
+Finds all sister terms for the synset in question, that is all other synsets which share a common hypernym. The object 
+passed to the supplied callback function is an array consisting of the hypernym synset, which has an additional *hyponym*
+key which holds an array of its hyponyms. For example, in a given deck of cards, the queen is one of three card types bearing a face. 
+When asking WordNet to find the sister terms of a queen of cards, it firsts finds its hypernym and then correclty outputs 
+the sister terms as *jack* and *king*. See the example.
+
+Example:
+
+```
+wn.fetchSynset("queen.n.7", function(err, synset){
+	synset.getSisterTerms(function(err, data){ console.log(util.inspect(data, null, 5)); });
 })
 ```
 
 Output:
 
 ```
-
+[ { synsetid: 103318973,
+    words: 
+     [ { lemma: 'court card' },
+       { lemma: 'face card' },
+       { lemma: 'picture card' } ],
+    definition: 'one of the twelve cards in a deck bearing a picture of a face',
+    pos: 'n',
+    lexdomain: 'noun.artifact',
+    hyponym: 
+     [ { synsetid: 103594280,
+         pos: 'n',
+         lexdomain: 'noun.artifact',
+         definition: 'one of four face cards in a deck bearing a picture of a young prince',
+         words: [ { lemma: 'jack' }, { lemma: 'knave' } ] },
+       { synsetid: 103623428,
+         pos: 'n',
+         lexdomain: 'noun.artifact',
+         definition: 'one of the four playing cards in a deck bearing the picture of a king',
+         words: [ { lemma: 'king' } ] },
+       { synsetid: 104039901,
+         pos: 'n',
+         lexdomain: 'noun.artifact',
+         definition: 'one of four face cards in a deck bearing a picture of a queen',
+         words: [ { lemma: 'queen' } ] } ] } ]
 ``` 
 
 #### .causeOf()
 
+### Other Functions
 
+#### wn.print(input)
+
+This utility function takes as its input an object of any class from the module and prints the content in a nicely formatted
+way to the terminal. An array of objects can also be supplied. 
+
+Example:
+```  
+wn.fetchSynset("fish.n.1").then(function(synsetArray){
+	synsetArray.getHypernymsTree().each(function(hypernym){
+			wn.print(hypernym);
+		})
+});
+```
+
+Output:
+```
+S: (n) aquatic vertebrate (animal living wholly or chiefly in or on water)
+    S: (n) craniate, vertebrate (animals having a bony or cartilaginous skeleton with a segmented spinal column and a large brain enclosed in a skull or cranium)
+        S: (n) chordate (any animal of the phylum Chordata having a notochord or spinal column)
+            S: (n) animal, animate being, beast, brute, creature, fauna (a living organism characterized by voluntary movement)
+                S: (n) being, organism (a living thing that has (or can develop) the ability to act or function independently)
+                    S: (n) animate thing, living thing (a living (or once living) entity)
+                        S: (n) unit, whole (an assemblage of parts that is regarded as a single entity)
+                            S: (n) object, physical object (a tangible and visible entity; an entity that can cast a shadow)
+                                S: (n) physical entity (an entity that has physical existence)
+                                    S: (n) entity (that which is perceived or known or inferred to have its own distinct existence (living or nonliving))
+```
