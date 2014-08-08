@@ -9,6 +9,15 @@ A node.js module for working with Princeton's WordNet lexical database for the E
 
 ## What is it about?
 
+For natural language processing tasks, Princeton University's WordNet database has proven to be a very valuabe resource. This package was created with the goal in mind to make it available for use in JavaScript. The package aims to provide access to most of the data and functionality which is part of WordNet, and indeed most information can already be retrieved and utilized. This functionality includes the following features:
+
+## Features
+
+- word type detection
+- abilitiy to retrieve hypernyms, synonyms, homonyms, meronyms etc. for a given synset 
+- asynchronuos module supporting both classical node.js callbacks and promises implemented via Bluebird
+- implements WordNet's Morphy to find base words of inflected forms
+
 ## Installation & Setup
 
 The module is available through npm via
@@ -31,20 +40,9 @@ the database file in another location, you have to tell the module as follows be
 wn.registerDatabase(<insert path here>);
 ``` 
 
-## Features
+## Example Code
 
-- module provides access to most of WordNet's resources to be used for various natural language processing tasks 
-- word type detection
-- abilitiy to retrieve hypernyms, synonyms, homonyms etc. for a given synset 
-- asynchronous module supporting both classical node.js callbacks and promises implemented via Bluebird
-- implements WordNet's Morphy to find base words of inflected forms
-
-## Example Usage
-
-
-
-
-Further example codes is distributed in the *examples* subdirectory of the package repository.
+Example code for most of the functions is distributed in the *examples* subdirectory of the package repository.
 
 # API
 
@@ -362,11 +360,132 @@ Output:
 
 #### .getHypernyms(callback)
 
+A hypernym is a synset constitution a semantic field to which many other synsets can belong. This function looks up the direct hypernym of the synset and passes it to the callback function. 
+
+Example:
+```
+// the synset king.n.10 is: king - (chess) the weakest but the most important piece
+wn.fetchSynset("king.n.10").then(function(synset){
+	synset.getHypernyms().then(function(hypernym){
+		console.log(util.inspect(hypernym, null, 3));
+	});
+})
+```
+
+Output:
+```
+[ { synsetid: 103018094,
+    words: [ { lemma: 'chess piece' }, { lemma: 'chessman' } ],
+    definition: 'any of 16 white and 16 black pieces used in playing the game of chess',
+    pos: 'n',
+    lexdomain: 'noun.artifact' } ]
+```
+
 #### .getHypernymsTree(callback)
+
+In contrast to *.getHypernyms*, this function performs a recursive search to also retrieve the information about the hypernyms of the found hypernyms, yielding a hierarchical tree structure with the synsets who do not have any more hypernyms at the top. The returned array includes the found hypernyms as *Synset* objects, with an additional key named *hypernym* which containing its hypernym, again as an object of class *Synset*. 
+
+Example:
+
+```
+wn.fetchSynset("bacteria.n.1", function(err, synset){
+	synset.getHypernymsTree(function(err, data){
+		console.log(util.inspect(data, null, 3));
+	});
+});
+```
+
+Output:
+
+```
+[ { synsetid: 101328932,
+    words: [ { lemma: 'micro-organism' }, { lemma: 'microorganism' } ],
+    definition: 'any organism of microscopic size',
+    pos: 'n',
+    lexdomain: 'noun.animal',
+    hypernym: 
+     [ { synsetid: 100004475,
+         words: [Object],
+         definition: 'a living thing that has (or can develop) the ability to act or function independently',
+         pos: 'n',
+         lexdomain: 'noun.tops',
+         hypernym: [Object] } ] } ]
+```
 
 #### .getHyponyms(callback)
 
+This function collects the hyponyms for the synset, where the hyponym of a synset is defined as a subordinate grouping. In doing so, the synset and its hyponym stand in a type-of relationship with each other. This function retrieves the 
+hyponyms of a synset and returns them in array to the callback.
+
+Example:
+
+```
+wn.fetchSynset("american.n.3").then(function(synset){
+	console.log(synset)
+	synset.getHyponyms().then(function(hyponym){
+		console.log(util.inspect(hyponym, null, 3))
+	});
+})
+```
+
+Output:
+
+```
+[ { synsetid: 109729069,
+    words: [ { lemma: 'creole' } ],
+    definition: 'a person of European descent born in the West Indies or Latin America',
+    pos: 'n',
+    lexdomain: 'noun.person' },
+  { synsetid: 109739652,
+    words: [ { lemma: 'latin american' }, { lemma: 'latino' } ],
+    definition: 'a native of Latin America',
+    pos: 'n',
+    lexdomain: 'noun.person' },
+  { synsetid: 109744643,
+    words: [ { lemma: 'north american' } ],
+    definition: 'a native or inhabitant of North America',
+    pos: 'n',
+    lexdomain: 'noun.person' },
+(...)
+]
+```
+
 #### .getHyponymsTree(callback)
+
+Performs a recursive search and returns an array of hyponyms, which are again just *Synset* objects. However, they additionally possess a field called *hyponym* which includes their own hyponym etc. 
+
+Example:
+
+```
+wn.fetchSynset("canadian.n.1").then(function(synset){
+	synset.getHyponymsTree().then(function(hypernym){
+		// only print first element of array to the console
+		console.log(util.inspect(hypernym[0], null, 3));
+	});
+})
+```
+
+Output:
+```
+{ synsetid: 109716159,
+  words: [ { lemma: 'french canadian' } ],
+  definition: 'a Canadian descended from early French settlers and whose native language is French',
+  pos: 'n',
+  lexdomain: 'noun.person',
+  hyponym: 
+   [ { synsetid: 109696564,
+       words: [ [Object] ],
+       definition: 'an early French settler in the Maritimes',
+       pos: 'n',
+       lexdomain: 'noun.person',
+       hyponym: [ [Object] ] },
+     { synsetid: 109716340,
+       words: [ [Object] ],
+       definition: 'informal term for Canadians in general and French Canadians in particular',
+       pos: 'n',
+       lexdomain: 'noun.person',
+       hyponym: [] } ] }
+```
 
 #### .getHolonyms(type, callback)
 
