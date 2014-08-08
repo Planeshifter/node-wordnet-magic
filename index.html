@@ -13,13 +13,13 @@
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <title>Node-wordnet-magic by Planeshifter</title>
+    <title>node-wordnet-magic by Planeshifter</title>
   </head>
 
   <body>
     <header>
       <div class="inner">
-        <h1>Node-wordnet-magic</h1>
+        <h1>node-wordnet-magic</h1>
         <h2>tools for working with Princeton&#39;s lexical database WordNet</h2>
         <a href="https://github.com/Planeshifter/node-wordnet-magic" class="button"><small>View project on</small>GitHub</a>
       </div>
@@ -41,7 +41,23 @@
 <h2>
 <a name="what-is-it-about" class="anchor" href="#what-is-it-about"><span class="octicon octicon-link"></span></a>What is it about?</h2>
 
+<p>Since natural language processing (NLP) has to deal with a lot of non-digital features (comprising ambivalence, dubiety of language, not to mention irony, lies or rethorical tricks and ruses) it always has been a great challenge, confronting the programmer with a constant need of sense disambiguation. </p>
+
+<p>The WordNet project of Princeton University, developed for more than 20 years, has been designed for the needs of computer linguistics and has proven to be a very valuabe resource in many of the hardest NLP tasks.</p>
+
+<p>The objective of this package is to make this richness available to the node eco-system. There are quite a few wordnet packages already, providing some nice features, but there is none that tries to reflect the complete WordNet architecture (centered around synsets). This is what the wordnet-magic module is aiming for.</p>
+
+<p>Currently, the module offers the following features:</p>
+
 <h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>word type detection</li>
+<li>abilitiy to retrieve hypernyms, synonyms, homonyms, meronyms etc. for a given synset </li>
+<li>asynchronuos module supporting both classical node.js callbacks and promises implemented via Bluebird</li>
+<li>implements WordNet's Morphy to find base words of inflected forms</li>
+</ul><h2>
 <a name="installation--setup" class="anchor" href="#installation--setup"><span class="octicon octicon-link"></span></a>Installation &amp; Setup</h2>
 
 <p>The module is available through npm via</p>
@@ -62,18 +78,9 @@ the database file in another location, you have to tell the module as follows be
 </code></pre>
 
 <h2>
-<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+<a name="example-code" class="anchor" href="#example-code"><span class="octicon octicon-link"></span></a>Example Code</h2>
 
-<ul>
-<li>module provides access to most of WordNet's resources to be used for various natural language processing tasks </li>
-<li>word type detection</li>
-<li>abilitiy to retrieve hypernyms, synonyms, homonyms etc. for a given synset </li>
-<li>asynchronous module supporting both classical node.js callbacks and promises implemented via Bluebird</li>
-<li>implements WordNet's Morphy to find base words of inflected forms</li>
-</ul><h2>
-<a name="example-usage" class="anchor" href="#example-usage"><span class="octicon octicon-link"></span></a>Example Usage</h2>
-
-<p>Further example codes is distributed in the <em>examples</em> subdirectory of the package repository.</p>
+<p>Example code for most of the functions is distributed in the <em>examples</em> subdirectory of the package repository.</p>
 
 <h1>
 <a name="api" class="anchor" href="#api"><span class="octicon octicon-link"></span></a>API</h1>
@@ -183,6 +190,24 @@ high.getAntonyms(function(err, antonymArray){
   { lemma: 'high',
     antonym: 'low',
     synset: 'used of sounds and voices; high in pitch or frequency' } ]
+</code></pre>
+
+<h4>
+<a name="getpolysemycountpos-callback" class="anchor" href="#getpolysemycountpos-callback"><span class="octicon octicon-link"></span></a>.getPolysemyCount(pos, callback)</h4>
+
+<p>Returns the polysemy count (also called familiarity) for the word. This denotes the number of different senses the word has in the supplied word type category. </p>
+
+<p>Example:</p>
+
+<pre><code>var kiss = new wordNet.Word("kiss","v");
+kiss.getPolysemyCount("v", function(err, data){
+    console.log(data);
+});
+</code></pre>
+
+<p>Output: </p>
+
+<pre><code>2
 </code></pre>
 
 <h2>
@@ -371,6 +396,65 @@ creation, emotion, motion, perception, possession, social, stative, weather</li>
 <p>A synset object is equipped with the following methods:</p>
 
 <h4>
+<a name="getdomainscallback" class="anchor" href="#getdomainscallback"><span class="octicon octicon-link"></span></a>.getDomains(callback)</h4>
+
+<p>Retrieves the domain the synset belongs to. There are three different types of domain, topic, region and usage, which 
+differentiate between topical, geographical and functional relations. The returned array consists of Synsets which have been augmented with this information: they hold an extra property called "domain_type" which indicates which of the three domain types applies.</p>
+
+<p>Example:</p>
+
+<pre><code>wn.fetchSynset("war.n.1").then(function(synset){
+    console.log(synset)
+    synset.getDomains().then(function(domain){
+        console.log(util.inspect(domain, null, 3))
+    });
+})
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>[ { synsetid: 108215965,
+    words: 
+     [ { lemma: 'armed forces' },
+       { lemma: 'armed services' },
+       { lemma: 'military' },
+       { lemma: 'military machine' },
+       { lemma: 'war machine' } ],
+    definition: 'the military forces of a nation',
+    pos: 'n',
+    lexdomain: 'noun.group',
+    domain_type: 'topic' } ]
+</code></pre>
+
+<h4>
+<a name="getdomaintermscallback" class="anchor" href="#getdomaintermscallback"><span class="octicon octicon-link"></span></a>.getDomainTerms(callback)</h4>
+
+<p>Retrieves all the terms for which the current synset functions as a domain. Again, there are the different types of domain: topic, region and usage. The returned array consists of Synsets which have been augmented with this information: they hold an extra property called "term_type" which indicates which of the three domain types applies.</p>
+
+<p>Example:</p>
+
+<pre><code>wn.fetchSynset("dance.v.2").then(function(synset){
+    synset.getDomainTerms().then(function(domain){
+        console.log(util.inspect(domain, null, 3))
+    });
+})
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>[ { synsetid: 100429255,
+    words: 
+     [ { lemma: 'dance' },
+       { lemma: 'dancing' },
+       { lemma: 'saltation' },
+       { lemma: 'terpsichore' } ],
+    definition: 'taking a series of rhythmical steps (and movements) in time to music',
+    pos: 'n',
+    lexdomain: 'noun.act',
+    term_type: 'topic' } ]
+</code></pre>
+
+<h4>
 <a name="getexamplescallback" class="anchor" href="#getexamplescallback"><span class="octicon octicon-link"></span></a>.getExamples(callback)</h4>
 
 <p>Returns an array of sample sentences for the synset in question. </p>
@@ -416,14 +500,130 @@ creation, emotion, motion, perception, possession, social, stative, weather</li>
 <h4>
 <a name="gethypernymscallback" class="anchor" href="#gethypernymscallback"><span class="octicon octicon-link"></span></a>.getHypernyms(callback)</h4>
 
+<p>A hypernym is a synset constitution a semantic field to which many other synsets can belong. This function looks up the direct hypernym of the synset and passes it to the callback function. </p>
+
+<p>Example:</p>
+
+<pre><code>// the synset king.n.10 is: king - (chess) the weakest but the most important piece
+wn.fetchSynset("king.n.10").then(function(synset){
+    synset.getHypernyms().then(function(hypernym){
+        console.log(util.inspect(hypernym, null, 3));
+    });
+})
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>[ { synsetid: 103018094,
+    words: [ { lemma: 'chess piece' }, { lemma: 'chessman' } ],
+    definition: 'any of 16 white and 16 black pieces used in playing the game of chess',
+    pos: 'n',
+    lexdomain: 'noun.artifact' } ]
+</code></pre>
+
 <h4>
 <a name="gethypernymstreecallback" class="anchor" href="#gethypernymstreecallback"><span class="octicon octicon-link"></span></a>.getHypernymsTree(callback)</h4>
+
+<p>In contrast to <em>.getHypernyms</em>, this function performs a recursive search to also retrieve the information about the hypernyms of the found hypernyms, yielding a hierarchical tree structure with the synsets who do not have any more hypernyms at the top. The returned array includes the found hypernyms as <em>Synset</em> objects, with an additional key named <em>hypernym</em> which containing its hypernym, again as an object of class <em>Synset</em>. </p>
+
+<p>Example:</p>
+
+<pre><code>wn.fetchSynset("bacteria.n.1", function(err, synset){
+    synset.getHypernymsTree(function(err, data){
+        console.log(util.inspect(data, null, 3));
+    });
+});
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>[ { synsetid: 101328932,
+    words: [ { lemma: 'micro-organism' }, { lemma: 'microorganism' } ],
+    definition: 'any organism of microscopic size',
+    pos: 'n',
+    lexdomain: 'noun.animal',
+    hypernym: 
+     [ { synsetid: 100004475,
+         words: [Object],
+         definition: 'a living thing that has (or can develop) the ability to act or function independently',
+         pos: 'n',
+         lexdomain: 'noun.tops',
+         hypernym: [Object] } ] } ]
+</code></pre>
 
 <h4>
 <a name="gethyponymscallback" class="anchor" href="#gethyponymscallback"><span class="octicon octicon-link"></span></a>.getHyponyms(callback)</h4>
 
+<p>This function collects the hyponyms for the synset, where the hyponym of a synset is defined as a subordinate grouping. In doing so, the synset and its hyponym stand in a type-of relationship with each other. This function retrieves the 
+hyponyms of a synset and returns them in array to the callback.</p>
+
+<p>Example:</p>
+
+<pre><code>wn.fetchSynset("american.n.3").then(function(synset){
+    console.log(synset)
+    synset.getHyponyms().then(function(hyponym){
+        console.log(util.inspect(hyponym, null, 3))
+    });
+})
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>[ { synsetid: 109729069,
+    words: [ { lemma: 'creole' } ],
+    definition: 'a person of European descent born in the West Indies or Latin America',
+    pos: 'n',
+    lexdomain: 'noun.person' },
+  { synsetid: 109739652,
+    words: [ { lemma: 'latin american' }, { lemma: 'latino' } ],
+    definition: 'a native of Latin America',
+    pos: 'n',
+    lexdomain: 'noun.person' },
+  { synsetid: 109744643,
+    words: [ { lemma: 'north american' } ],
+    definition: 'a native or inhabitant of North America',
+    pos: 'n',
+    lexdomain: 'noun.person' },
+(...)
+]
+</code></pre>
+
 <h4>
 <a name="gethyponymstreecallback" class="anchor" href="#gethyponymstreecallback"><span class="octicon octicon-link"></span></a>.getHyponymsTree(callback)</h4>
+
+<p>Performs a recursive search and returns an array of hyponyms, which are again just <em>Synset</em> objects. However, they additionally possess a field called <em>hyponym</em> which includes their own hyponym etc. </p>
+
+<p>Example:</p>
+
+<pre><code>wn.fetchSynset("canadian.n.1").then(function(synset){
+    synset.getHyponymsTree().then(function(hypernym){
+        // only print first element of array to the console
+        console.log(util.inspect(hypernym[0], null, 3));
+    });
+})
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>{ synsetid: 109716159,
+  words: [ { lemma: 'french canadian' } ],
+  definition: 'a Canadian descended from early French settlers and whose native language is French',
+  pos: 'n',
+  lexdomain: 'noun.person',
+  hyponym: 
+   [ { synsetid: 109696564,
+       words: [ [Object] ],
+       definition: 'an early French settler in the Maritimes',
+       pos: 'n',
+       lexdomain: 'noun.person',
+       hyponym: [ [Object] ] },
+     { synsetid: 109716340,
+       words: [ [Object] ],
+       definition: 'informal term for Canadians in general and French Canadians in particular',
+       pos: 'n',
+       lexdomain: 'noun.person',
+       hyponym: [] } ] }
+</code></pre>
 
 <h4>
 <a name="getholonymstype-callback" class="anchor" href="#getholonymstype-callback"><span class="octicon octicon-link"></span></a>.getHolonyms(type, callback)</h4>
@@ -542,7 +742,28 @@ the sister terms as <em>jack</em> and <em>king</em>. See the example.</p>
 </code></pre>
 
 <h4>
-<a name="causeof" class="anchor" href="#causeof"><span class="octicon octicon-link"></span></a>.causeOf()</h4>
+<a name="causeofcallback" class="anchor" href="#causeofcallback"><span class="octicon octicon-link"></span></a>.causeOf(callback)</h4>
+
+<p>Defined for two verbs X and Y, where X causes the action of Y. The result set is an array consisting of the 
+synset(s) which are caused by the synset this method belongs to. </p>
+
+<p>Example:</p>
+
+<pre><code>wn.fetchSynset("leak.v.1",function(err, synset){
+    synset.causeOf(function(err, data){
+        console.log(data)
+    });
+})
+</code></pre>
+
+<p>Output:</p>
+
+<pre><code>[ { synsetid: 200938019,
+    words: [ [Object], [Object], [Object] ],
+    definition: 'be released or become known; of news',
+    pos: 'v',
+    lexdomain: 'verb.communication' } ]
+</code></pre>
 
 <h3>
 <a name="other-functions" class="anchor" href="#other-functions"><span class="octicon octicon-link"></span></a>Other Functions</h3>
@@ -565,7 +786,7 @@ way to the terminal. An array of objects can also be supplied. </p>
 <p>Output:</p>
 
 <pre><code>S: (n) aquatic vertebrate (animal living wholly or chiefly in or on water)
-    S: (n) craniate, vertebrate (animals having a bony or cartilaginous skeleton with a segmented spinal column and a large brain enclosed in a skull or cranium)
+    S: (n) craniate, vertebrate (animals having a bony or cartilaginous skeleton with a segmented spinal  column and a large brain enclosed in a skull or cranium)
         S: (n) chordate (any animal of the phylum Chordata having a notochord or spinal column)
             S: (n) animal, animate being, beast, brute, creature, fauna (a living organism characterized by voluntary movement)
                 S: (n) being, organism (a living thing that has (or can develop) the ability to act or function independently)
