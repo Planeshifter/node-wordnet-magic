@@ -341,6 +341,67 @@ creation, emotion, motion, perception, possession, social, stative, weather
 
 A synset object is equipped with the following methods:
 
+#### .getDomains(callback)
+
+Retrieves the domain the synset belongs to. There are three different types of domain, topic, region and usage, which 
+differentiate between topical, geographical and functional relations. The returned array consists of Synsets which have been augmented with this information: they hold an extra property called "domain_type" which indicates which of the three domain types applies.
+
+Example:
+
+```
+wn.fetchSynset("war.n.1").then(function(synset){
+	console.log(synset)
+	synset.getDomains().then(function(domain){
+		console.log(util.inspect(domain, null, 3))
+	});
+})
+```
+
+Output:
+
+```
+[ { synsetid: 108215965,
+    words: 
+     [ { lemma: 'armed forces' },
+       { lemma: 'armed services' },
+       { lemma: 'military' },
+       { lemma: 'military machine' },
+       { lemma: 'war machine' } ],
+    definition: 'the military forces of a nation',
+    pos: 'n',
+    lexdomain: 'noun.group',
+    domain_type: 'topic' } ]
+```
+
+#### .getDomainTerms(callback)
+
+Retrieves all the terms for which the current synset functions as a domain. Again, there are the different types of domain: topic, region and usage. The returned array consists of Synsets which have been augmented with this information: they hold an extra property called "term_type" which indicates which of the three domain types applies.
+
+Example:
+
+```
+wn.fetchSynset("dance.v.2").then(function(synset){
+	synset.getDomainTerms().then(function(domain){
+		console.log(util.inspect(domain, null, 3))
+	});
+})
+```
+
+Output:
+
+```
+[ { synsetid: 100429255,
+    words: 
+     [ { lemma: 'dance' },
+       { lemma: 'dancing' },
+       { lemma: 'saltation' },
+       { lemma: 'terpsichore' } ],
+    definition: 'taking a series of rhythmical steps (and movements) in time to music',
+    pos: 'n',
+    lexdomain: 'noun.act',
+    term_type: 'topic' } ]
+```
+
 #### .getExamples(callback)
 
 Returns an array of sample sentences for the synset in question. 
