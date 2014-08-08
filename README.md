@@ -9,7 +9,13 @@ A node.js module for working with Princeton's WordNet lexical database for the E
 
 ## What is it about?
 
-For natural language processing tasks, Princeton University's WordNet database has proven to be a very valuabe resource. This package was created with the goal in mind to make it available for use in JavaScript. The package aims to provide access to most of the data and functionality which is part of WordNet, and indeed most information can already be retrieved and utilized. This functionality includes the following features:
+Since natural language processing (NLP) has to deal with a lot of non-digital features (comprising ambivalence, dubiety of language, not to mention irony, lies or rethorical tricks and ruses) it always has been a great challenge, confronting the programmer with a constant need of sense disambiguation. 
+
+The WordNet project of Princeton University, developed for more than 20 years, has been designed for the needs of computer linguistics and has proven to be a very valuabe resource in many of the hardest NLP tasks.
+
+The objective of this package is to make this richness available to the node eco-system. There are quite a few wordnet packages already, providing some nice features, but there is none that tries to reflect the complete WordNet architecture (centered around synsets). This is what the wordnet-magic module is aiming for.
+
+Currently, the module offers the following features:
 
 ## Features
 
@@ -145,6 +151,25 @@ Output:
   { lemma: 'high',
     antonym: 'low',
     synset: 'used of sounds and voices; high in pitch or frequency' } ]
+```
+
+#### .getPolysemyCount(pos, callback)
+
+Returns the polysemy count (also called familiarity) for the word. This denotes the number of different senses the word has in the supplied word type category. 
+
+Example:
+
+```
+var kiss = new wordNet.Word("kiss","v");
+kiss.getPolysemyCount("v", function(err, data){
+	console.log(data);
+});
+```
+
+Output: 
+
+```
+2
 ```
 
 ## Morphy
