@@ -3,9 +3,11 @@ var util = require("util");
 
 
 // using Promises
-wn.fetchSynset("bacteria.n.1", function(err, synset){
+wn.fetchSynset("king.n.10", function(err, synset){
 	synset.getHypernymTree(function(err, data){
-		console.log(util.inspect(data, null, 3));
+		// console.log(util.inspect(data, null, 3));
+		// wn.print(data);
+		console.log(JSON.stringify(data));
 	});
 });
 

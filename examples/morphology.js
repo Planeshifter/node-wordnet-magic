@@ -1,5 +1,13 @@
 var wordNet = require("../src/index.js");
 
+// wordNet.morphy("scared","v").then(console.log);
+
+var scare = new wordNet.Word("scared");
+
+scare.getSynsets().then(wordNet.print)
+
+
+/*
 wordNet.morphy("better","a").then(console.log);
 
 wordNet.morphy("denied","v").then(console.log);
@@ -29,3 +37,4 @@ wordNet.morphy("kissed", "v", function(err, data){
 wordNet.morphy("minions", "n", function(err, data){
 	console.log(data);
 })
+*/

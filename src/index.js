@@ -4,15 +4,18 @@ var Promise = require('bluebird');
 var join = Promise.join;
 var _ = require('underscore');
 var fs = require('fs');
+var path = require('path');
+
 
 // initialize standard path
-var file = '../data/sqlite-31.db';
+var file =  path.normalize(__dirname + '/../data/sqlite-31.db');
 var db;
 var exists = fs.existsSync(file);
+console.log(exists)
 if (exists){ 
   db = Promise.promisifyAll(new sqlite3.Database(file));
 } else {
-	if("Couldn't find file 'sqlite-31.db' in data subdirectory. " +
+	console.log("Couldn't find file 'sqlite-31.db' in data subdirectory. " +
 			"Please supply the correct path by using .registerDatabase(path), otherwise " +
 			"the module does not work.");
 }
