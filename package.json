@@ -1,6 +1,6 @@
 {
   "name": "wordnet-magic",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "tools for working with Princeton's lexical database WordNet",
   "main": "src/index.js",
   "scripts": {
