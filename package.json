@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Planeshifter/wordnet-magic"
+    "url": "https://github.com/Planeshifter/node-wordnet-magic"
   },
   "keywords": [
     "WordNet",
@@ -19,9 +19,9 @@
   "author": "Philipp Burckhardt",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Planeshifter/wordnet-magic/issues"
+    "url": "https://github.com/Planeshifter/node-wordnet-magic/issues"
   },
-  "homepage": "https://github.com/Planeshifter/wordnet-magic",
+  "homepage": "https://github.com/Planeshifter/node-wordnet-magic",
   "dependencies": {
     "bluebird": "^2.2.2",
     "sqlite3": "^2.2.4",
