@@ -261,29 +261,22 @@ wn.Word.prototype = {
 	var self = this;
 	self.part_of_speech = self.part_of_speech || null; 
 	
-	function _findSynsetsArray(word){
-	  return _findWordId(word).then(_findSynsetsFromId);
-	}
-	
-	function _findWordId(str){	
-	  return db.eachAsync("SELECT wordid FROM words WHERE lemma = $str",{
-	    $str: str
-	  });
-	}
-	
-	function _findSynsetsFromId(data){
+	function _findSynsetsArray(data){
 		switch(self.part_of_speech){
 		case null:
-			var query = "SELECT synsetid FROM senses WHERE wordid = $wordid";
+			var query = "SELECT s.synsetid AS synsetid, s.definition AS definition, s.pos AS pos, l.lexdomainname AS lexdomain FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid";
+			query += " WHERE s.lemma = $lemma ORDER BY s.pos, s.sensenum";
+			console.log(query)
 			var ret =  db.allAsync(query,{
-				   $wordid: data.wordid,
+				   $lemma: data,
 				 });
 		break;
 		default: 
-		     var query = "SELECT senses.synsetid FROM senses INNER JOIN synsets ON synsets.synsetid = senses.synsetid";
-			 query +=" WHERE wordid = $wordid AND pos = $pos";  
+			var query = "SELECT s.synsetid AS synsetid, s.definition AS definition, s.pos AS pos, l.lexdomainname AS lexdomain FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid";
+			query += " WHERE s.pos = $pos AND s.lemma = $lemma ORDER BY s.sensenum";
+			console.log(query)
 		     var ret =  db.allAsync(query,{
-			   $wordid: data.wordid,
+			   $lemma: data,
 			   $pos: self.part_of_speech
 			 });
 		}
@@ -298,15 +291,6 @@ wn.Word.prototype = {
 		};
 	 return Promise.all(SynsetArray);
 	 }
-	
-	 function _findSynsetDefFromId(data){
-       var query = "SELECT ss.synsetid, ss.pos, ld.lexdomainname AS lexdomain, ss.definition";
-	   query += " FROM synsets AS ss INNER JOIN lexdomains AS ld ON ld.lexdomainid = ss.lexdomainid"; 
-	   query += " WHERE synsetid = $synsetid";
-	   return db.eachAsync(query, {
-		 $synsetid: data.synsetid
-	   });
-	  }
 	 
     var promise =  _findSynsetsArray(this.lemma).then(_formSynsetsArray).map(_appendLemmas).map(function(item){
       return new wn.Synset(item);
@@ -437,7 +421,7 @@ wn.Synset.prototype = {
 		  fetchSynset: function(callback){
 			  var inputs = obj.split(".");
 			  
-			  var query = "SELECT s.synsetid, s.definition, s.pos,l.lexdomainname AS lexdomain FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid";
+			  var query = "SELECT s.synsetid, s.definition, s.pos, l.lexdomainname AS lexdomain FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid";
 			  query += "WHERE s.pos = $pos AND s.lemma = $lemma AND s.sensenum = $sensenum";
 			  
 			  var ret = db.eachAsync(query,{
