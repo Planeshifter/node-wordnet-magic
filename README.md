@@ -47,7 +47,7 @@ var wn = wordNet("insert path");
 The `wordNet` function has one parameter: The path of the WordNet database in SQLite format, which can be obtained from the URL 
 [http://sourceforge.net/projects/wnsql/files/wnsql3/sqlite/](http://sourceforge.net/projects/wnsql/files/wnsql3/sqlite/).  
 If no path is supplied, i.e. `wordNet()` is called, the function look in the /data folder of the package directory for a file with the name `sqlite-31.db`. 
-The package ships with two shell scripts, `download.bat` and `download.sh` stored in the data directory which can be used to automatically download the required database on Windows and Unix operating systems, respectively.
+The package ships with two shell scripts, `download.bat` and `download.sh` stored in the /data directory which can be used to automatically download the required database on Windows and Unix operating systems, respectively.
 
 ## Example Code
 
