@@ -1,40 +1,41 @@
 var wordNet = require("../src/index.js");
+var wn = wordNet();
 
 // wordNet.morphy("scared","v").then(console.log);
 
-var scare = new wordNet.Word("scared");
+var scare = new wn.Word("scared");
 
-scare.getSynsets().then(wordNet.print)
+scare.getSynsets().then(wn.print)
 
 
 /*
-wordNet.morphy("better","a").then(console.log);
+wn.morphy("better","a").then(console.log);
 
-wordNet.morphy("denied","v").then(console.log);
+wn.morphy("denied","v").then(console.log);
 
-wordNet.morphy("churches","n").then(console.log);
+wn.morphy("churches","n").then(console.log);
 
-wordNet.morphy("structures","n").then(console.log);
+wn.morphy("structures","n").then(console.log);
 
-wordNet.morphy("walking").then(console.log);
+wn.morphy("walking").then(console.log);
 
-wordNet.morphy("taught","v").then(console.log);
+wn.morphy("taught","v").then(console.log);
 
-wordNet.morphy("fruitful").then(console.log);
+wn.morphy("fruitful").then(console.log);
 
-wordNet.morphy("loci", "n" , function(err, data){
+wn.morphy("loci", "n" , function(err, data){
 	console.log(data);
 })
 
-wordNet.morphy("timed", null, function(err, data){
+wn.morphy("timed", null, function(err, data){
   console.log(data);
 })
 
-wordNet.morphy("kissed", "v", function(err, data){
+wn.morphy("kissed", "v", function(err, data){
 	console.log(data);
 })
 
-wordNet.morphy("minions", "n", function(err, data){
+wn.morphy("minions", "n", function(err, data){
 	console.log(data);
 })
 */

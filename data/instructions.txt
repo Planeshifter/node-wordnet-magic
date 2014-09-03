@@ -1,5 +1,0 @@
-The package expects the WordNet database in SQLite format in this directory.
-A current version can be obtained from the URL http://sourceforge.net/projects/wnsql/files/wnsql3/sqlite/.
-As of time of writing, the latest version is 3.1, such that the file of the database should be sqlite-31.db. 
-If for whatever reason the name of your file differs from sqlite-31.db, you have to register the database after loading the package by invoking the
-registerDatabase(path) function at startup, which expects the path of the database as its first argument. 

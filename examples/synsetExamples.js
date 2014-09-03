@@ -1,4 +1,5 @@
-var wn = require("../src/index.js");
+var wordNet = require("../src/index.js");
+var wn = wordNet();
 
 // using callbacks
 

@@ -1,23 +1,24 @@
 var wordNet = require("../src/index.js");
+var wn = wordNet();
 
-wordNet.isVerb("find").then(console.log);
+wn.isVerb("find").then(console.log);
 
-wordNet.isVerb("kingdom", function(err, res){
+wn.isVerb("kingdom", function(err, res){
 	console.log(res);
 });
 
-wordNet.isVerb("kill", function(err, res){
+wn.isVerb("kill", function(err, res){
 	console.log(res);
 });
 
-wordNet.isNoun("tiger").then(console.log);
+wn.isNoun("tiger").then(console.log);
 
-wordNet.isNoun("happy").then(console.log);
+wn.isNoun("happy").then(console.log);
 
-wordNet.isAdjective("filthy").then(console.log);
+wn.isAdjective("filthy").then(console.log);
 
-wordNet.isAdverb("helpfully").then(console.log);
+wn.isAdverb("helpfully").then(console.log);
 
-wordNet.isNoun("callback", function(err, data){ console.log(data)});
+wn.isNoun("callback", function(err, data){ console.log(data)});
 
-wordNet.isNoun("promise").then(console.log);
+wn.isNoun("promise").then(console.log);

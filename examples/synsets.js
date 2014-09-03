@@ -1,21 +1,22 @@
 var wordNet = require("../src/index.js");
+var wn = wordNet();
 var util = require("util");
 
-var walk = new wordNet.Word("walk","v");
+var walk = new wn.Word("walk","v");
 
 // using classic node.js callbacks, retrieve
 // only synsets for verbs
 walk.getSynsets(function(err, data){
 	console.log(util.inspect(data, null, 3));
-	wordNet.print(data)
+	wn.print(data)
 });
 
-var bank = new wordNet.Word("bank","n");
+var bank = new wn.Word("bank","n");
 
 // using classic node.js callbacks, retrieve
 // only synsets for nouns
 bank.getSynsets(function(err, data){
 	console.log(util.inspect(data, null, 3));
-	wordNet.print(data)
+	wn.print(data)
 });
 

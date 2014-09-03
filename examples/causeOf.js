@@ -1,5 +1,7 @@
-var wn = require("../src/index.js");
+var wordNet = require("../src/index.js");
 var util = require("util");
+
+var wn = wordNet();
 
 wn.fetchSynset("leak.v.1",function(err, synset){
 	synset.causeOf(function(err, data){

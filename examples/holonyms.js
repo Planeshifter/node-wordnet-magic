@@ -12,7 +12,9 @@ or a member of, the whole. That is,
  According to WordNet, 'bark' is a holonym of 'root', of 'trunk' and of 'branch.':
  */
 
-var wn = require("../src/index.js");
+var wordNet = require("../src/index.js");
+var wn = wordNet();
+
 var util = require("util");
 var bark = new wn.Word("bark");
 
