@@ -9,9 +9,9 @@ A node.js module for working with Princeton's WordNet lexical database for the E
 
 ## What is it about?
 
-Since natural language processing (NLP) has to deal with a lot of non-digital features (comprising ambivalence, dubiety of language, not to mention irony, lies or rethorical tricks and ruses) it always has been a great challenge, confronting the programmer with a constant need of sense disambiguation. 
+Since natural language processing (NLP) has to deal with a lot of non-digital features (comprising ambivalence, dubiety of language, not to mention irony, lies or rhetorical tricks and ruses) it always has been a great challenge, confronting the programmer with a constant need of sense disambiguation. 
 
-The WordNet project of Princeton University, developed for more than 20 years, has been designed for the needs of computer linguistics and has proven to be a very valuabe resource in many of the hardest NLP tasks.
+The WordNet project of Princeton University, developed for more than 20 years, has been designed for the needs of computer linguistics and has proven to be a very valuable resource in many of the hardest NLP tasks.
 
 The objective of this package is to make this richness available to the node eco-system. There are quite a few wordnet packages already, providing some nice features, but there is none that tries to reflect the complete WordNet architecture (centered around synsets). This is what the wordnet-magic module is aiming for.
 
@@ -21,7 +21,7 @@ Currently, the module offers the following features:
 
 - word type detection
 - abilitiy to retrieve hypernyms, synonyms, homonyms, meronyms etc. for a given synset 
-- asynchronuos module supporting both classical node.js callbacks and promises implemented via Bluebird
+- asynchronous module supporting both classical node.js callbacks and promises implemented via Bluebird
 - implements WordNet's Morphy to find base words of inflected forms
 
 ## Installation & Setup
@@ -35,16 +35,19 @@ npm install wordnet-magic
 Inside node, the package can then be loaded as any other module:
 
 ``` 
-var wn = require('wordnet-magic');
+var wordNet = require('wordnet-magic');
 ``` 
 
-However, the WordNet database has to be downloaded seperately and placed into the /data folder of the package directory. The package expects WordNet in SQLite format, which can be obtained from the URL 
-[http://sourceforge.net/projects/wnsql/files/wnsql3/sqlite/](http://sourceforge.net/projects/wnsql/files/wnsql3/sqlite/). If for whatever reason you decide to place
-the database file in another location, you have to tell the module as follows before using any of the other functions:
+You can then create a connection to the WordNet database by calling the exposed function 
 
-``` 
-wn.registerDatabase(<insert path here>);
-``` 
+```
+var wn = wordNet("insert path");
+```
+
+The `wordNet` function has one parameter: The path of the WordNet database in SQLite format, which can be obtained from the URL 
+[http://sourceforge.net/projects/wnsql/files/wnsql3/sqlite/](http://sourceforge.net/projects/wnsql/files/wnsql3/sqlite/).  
+If no path is supplied, i.e. `wordNet()` is called, the function look in the /data folder of the package directory for a file with the name `sqlite-31.db`. 
+The package ships with two shell scripts, `download.bat` and `download.sh` which can be used to automatically download the required database on Windows and Unix operating systems, respectively.
 
 ## Example Code
 
@@ -127,7 +130,7 @@ Output:
 #### .getAntonyms(callback)
 
 Retrieves an array of objects containing the antonyms (= words opposite in meaning, e.g. black and white) for 
-the supplied word and passes it to the supplied callback function. The objects have three keys, the orginal *lemma*, the 
+the supplied word and passes it to the supplied callback function. The objects have three keys, the original *lemma*, the 
 *synset* for which the antonym relationship exists and the *antonym* itself. 
 
 Example:

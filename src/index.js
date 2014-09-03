@@ -67,10 +67,6 @@ function makeWordNet(input_path){
 
 	var wn = {};
 
-	wn.registerDatabase = function(path){
-		db = Promise.promisifyAll(new sqlite3.Database(path));
-	}
-
 	wn.MORPHY_SUBSTITUTIONS = {
 			  NOUN:
 		      [{ suffix: 's', ending: ''},
