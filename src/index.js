@@ -473,16 +473,10 @@ function makeWordNet(input_path){
 				return promise.nodeify(callback);
 			  },
 			  getHyponyms: function(callback){
-				  function getHyponymsFromId(input){
-						return _findHyponymsArray(input).map(_appendLemmas).map(function(item){
-							return Promise.props(item);
-						}).map(function(item){
-							var obj = new wn.Synset(item);
-							return obj;
-						});	
-					}  
-					var promise = getHyponymsFromId(this.synsetid);
-					return promise.nodeify(callback);
+				  var promise = _findHyponymsArray(this.synsetid).map(_appendLemmas).map(function(item){
+					   return new wn.Synset(item);
+				  });
+				  return promise.nodeify(callback);			  
 			  },
 			  getHyponymsTree: function(callback){
 				  function getHyponymsFromId(input){
