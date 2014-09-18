@@ -475,7 +475,6 @@ function makeWordNet(input_path){
 			  getHyponyms: function(callback){
 				  function getHyponymsFromId(input){
 						return _findHyponymsArray(input).map(_appendLemmas).map(function(item){
-							item.sister_term = getHyponymsFromId(item.synsetid);
 							return Promise.props(item);
 						}).map(function(item){
 							var obj = new wn.Synset(item);
