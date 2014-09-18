@@ -453,13 +453,13 @@ function makeWordNet(input_path){
 				})  
 				return promise.nodeify(callback);
 			  },
-			  getHypernym: function(callback){
+			  getHypernyms: function(callback){
 				  var promise = _findHypernymsArray(this.synsetid).map(_appendLemmas).map(function(item){
 					   return new wn.Synset(item);
 				  });
 				  return promise.nodeify(callback);			  
 			  },
-			  getHypernymTree: function(callback){
+			  getHypernymsTree: function(callback){
 				function getHypernymFromId(input){
 					return _findHypernymsArray(input).map(_appendLemmas).map(function(item){
 						item.hypernym = getHypernymFromId(item.synsetid);
