@@ -6,7 +6,7 @@ var util = require("util");
 
 // using Promises
 wn.fetchSynset("king.n.10", function(err, synset){
-	synset.getHypernymTree(function(err, data){
+	synset.getHypernymsTree(function(err, data){
 		// console.log(util.inspect(data, null, 3));
 		// wn.print(data);
 		console.log(JSON.stringify(data));
@@ -14,7 +14,7 @@ wn.fetchSynset("king.n.10", function(err, synset){
 });
 
 wn.fetchSynset("golf.n.1", function(err, synset){
-	synset.getHypernymTree(function(err, data){
+	synset.getHypernymsTree(function(err, data){
 		// console.log(util.inspect(data, null, 3));
 	 wn.print(data);
 	});
