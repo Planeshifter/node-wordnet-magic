@@ -19,7 +19,7 @@ king.getSynsets("n").then(function(synsetArray){
 
 wn.fetchSynset("king.n.10").then(function(synset){
 	console.log(synset)
-	synset.getHypernym().then(function(hypernym){
+	synset.getHypernyms().then(function(hypernym){
 		console.log(util.inspect(hypernym, null, 3))
 	});
 })
