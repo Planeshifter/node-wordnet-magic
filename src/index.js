@@ -314,13 +314,13 @@ function makeWordNet(input_path, preload){
 		  }
 
 		function _formSynsetsArray(data){
-		    var SynsetArray = [];
+		  var SynsetArray = [];
 			for (var i = 0; i < data.length; i++){
 			  var obj =  _findSynsetDefFromId(data[i]);
 			  SynsetArray.push(obj);
 			};
-		 return Promise.all(SynsetArray);
-		 }
+		 	return Promise.all(SynsetArray);
+		 	}
 
 	    var promise =  _findSynsetsArray(this.lemma).then(_formSynsetsArray).map(_appendLemmas).map(function(item){
 	      return new wn.Synset(item);
@@ -360,7 +360,7 @@ function makeWordNet(input_path, preload){
 			break;
 			default:
 			     var query = "SELECT senses.synsetid FROM senses INNER JOIN synsets ON synsets.synsetid = senses.synsetid";
-				 query +=" WHERE wordid = $wordid AND pos = $pos";
+					 query +=" WHERE wordid = $wordid AND pos = $pos";
 			     var ret =  db.allAsync(query,{
 				   $wordid: data.wordid,
 				   $pos: self.part_of_speech
@@ -593,10 +593,20 @@ function makeWordNet(input_path, preload){
 				  var classification;
 
 				  function _findDomainTermsArray(synsetid){
-						var query = "SELECT synset1id, linkid FROM semlinks WHERE synset2id = $synset2id AND linkid IN (92, 94, 96)";
-						var arr = db.allAsync(query, {
-							$synset2id: synsetid
-						});
+				  	var arr;
+				  	if (!wn.preload){
+							var query = "SELECT synset1id, linkid FROM semlinks WHERE synset2id = $synset2id AND linkid IN (92, 94, 96)";
+							arr = db.allAsync(query, {
+								$synset2id: synsetid
+							});
+						} else {
+							arr = wn.SEMLINKS.then(function(data){
+								return data.filter(function(e){
+									return e.synset2id === synsetid && [92,94,96].contains(e.linkid);
+								});
+							});
+						}
+
 						return arr.map(function(data){
 							var obj = {};
 							obj.synsetid = data.synset1id;
