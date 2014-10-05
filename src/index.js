@@ -379,13 +379,24 @@ function makeWordNet(input_path, preload){
 		 }
 
 		 function _findSynsetDefFromId(data){
-	       var query = "SELECT ss.synsetid, ss.pos, ld.lexdomainname AS lexdomain, ss.definition";
-		   query += " FROM synsets AS ss INNER JOIN lexdomains AS ld ON ld.lexdomainid = ss.lexdomainid";
-		   query += " WHERE synsetid = $synsetid";
-		   return db.eachAsync(query, {
-			 $synsetid: data.synsetid
-		   });
+				var ret;
+				if (!wn.preload){
+				  var query = "SELECT ss.synsetid, ss.pos, ld.lexdomainname AS lexdomain, ss.definition";
+				  query += " FROM synsets AS ss INNER JOIN lexdomains AS ld ON ld.lexdomainid = ss.lexdomainid";
+				  query += " WHERE synsetid = $synsetid";
+				  ret = db.eachAsync(query, {
+				    $synsetid: data.synsetid
+				  });
+				} else {
+					ret = wn.SYNSETSxLEXDOMAINS.then(function(returnSet){
+						return returnSet.filter(function(e){
+							return e.synsetid === data.synsetid;
+						})[0];
+					});
+				}
+				return ret;
 		  }
+
 	    var promise =  _findSynsetsArray(this.lemma).then(_formAntonymsArray);
 	    return promise.nodeify(callback);
 	  },
@@ -558,10 +569,20 @@ function makeWordNet(input_path, preload){
 				  var classification;
 
 				  function _findDomainsArray(synsetid){
-						var query = "SELECT synset2id, linkid FROM semlinks WHERE synset1id = $synset1id AND linkid IN (91, 93, 95)";
-						var arr = db.allAsync(query, {
-							$synset1id: synsetid
-						});
+				  	var arr;
+				  	if (!wn.preload){
+							var query = "SELECT synset2id, linkid FROM semlinks WHERE synset1id = $synset1id AND linkid IN (91, 93, 95)";
+							arr = db.allAsync(query, {
+								$synset1id: synsetid
+							});
+				  	} else {
+							arr = wn.SEMLINKS.then(function(data){
+								return data.filter(function(e){
+									return e.synset1id === synsetid && [91,93,95].contains(e.linkid);
+								});
+							});
+				  	}
+
 						return arr.map(function(data){
 							var obj = {};
 							obj.synsetid = data.synset2id;
@@ -716,10 +737,21 @@ function makeWordNet(input_path, preload){
 	function _findSisterTermsArray(synsetid){
 		var hypernymIdArray = _findHypernymsArray(synsetid);
 		return hypernymIdArray.map(function(data){
-			var query = "SELECT synset1id FROM semlinks WHERE synset2id = $synset2id AND linkid = 1";
-			var arr =  db.allAsync(query,{
-				$synset2id: data.synsetid
-			});
+			var arr;
+			if (!wn.preload){
+				var query = "SELECT synset1id FROM semlinks WHERE synset2id = $synset2id AND linkid = 1";
+				arr =  db.allAsync(query,{
+					$synset2id: data.synsetid
+				});
+			} else {
+				arr = wn.SEMLINKS.then(function(resultSet){
+					return resultSet.filter(function(e){
+						return e.synset2id == data.synsetid && e.linkid == 1;
+					});
+				})
+				arr.then(console.log)
+				console.log("hallo")
+			}
 			arr = arr.map(function(data){
 				var obj = {};
 				obj.synsetid = data.synset1id;
@@ -886,7 +918,7 @@ function makeWordNet(input_path, preload){
 			});
 		} else {
 			arr = wn.SEMLINKS.filter(function(e){
-				return e.synset1id === synsetid && e.linkid = 1;
+				return e.synset1id === synsetid && e.linkid === 1;
 			});
 		}
 		return arr.map(function(data){

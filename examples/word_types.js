@@ -1,5 +1,5 @@
 var wordNet = require("../src/index.js");
-var wn = wordNet();
+var wn = wordNet(null, true);
 
 wn.isVerb("find").then(console.log);
 
