@@ -41,13 +41,15 @@ var wordNet = require('wordnet-magic');
 You can then create a connection to the WordNet database by calling the exposed function 
 
 ```
-var wn = wordNet("insert path");
+var wn = wordNet("insert path", preload);
 ```
 
-The `wordNet` function has one parameter: The path of the WordNet database in SQLite format, which can be obtained from the URL 
+The `wordNet` function has two parameters: The first one is the path of the WordNet database in SQLite format, which can be obtained from the URL 
 [http://sourceforge.net/projects/wnsql/files/wnsql3/sqlite/](http://sourceforge.net/projects/wnsql/files/wnsql3/sqlite/).  
-If no path is supplied, i.e. `wordNet()` is called, the function look in the /data folder of the package directory for a file with the name `sqlite-31.db`. 
+If no path is supplied, i.e. `wordNet()` is called, the function looks in the /data folder of the package directory for a file with the name `sqlite-31.db`. 
 The package ships with two shell scripts, `download.bat` and `download.sh` stored in the /data directory which can be used to automatically download the required database on Windows and Unix operating systems, respectively.
+
+The second parameter `preload` is a Boolean variable which specifies whether all (relevant) SQL tables should be loaded into memory as JS objects when loading the package. This is recommended for settings in which one has to execute a multitude of queries at once (e.g. when analyzing an entire text document), as individual calls to the database might be too expensive under these circumstances. The default value of the `preload` parameter is `false`.
 
 ## Example Code
 
