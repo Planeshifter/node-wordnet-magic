@@ -1,6 +1,6 @@
 /*
 Source: http://en.wikipedia.org/wiki/Holonymy
-Holonymy defines the relationship between a term denoting the whole and a term denoting a part of, 
+Holonymy defines the relationship between a term denoting the whole and a term denoting a part of,
 or a member of, the whole. That is,
 
     'X' is a holonym of 'Y' if Ys are parts of Xs, or
@@ -13,7 +13,7 @@ or a member of, the whole. That is,
  */
 
 var wordNet = require("../src/index.js");
-var wn = wordNet();
+var wn = wordNet(null, true);
 
 var util = require("util");
 var bark = new wn.Word("bark");
@@ -33,8 +33,8 @@ bark.getSynsets().then(function(synsetArray){
 
 // get Holonym for ship
 
-wn.fetchSynset("member.n.1", function(err, synset){
-	console.log(synset)
+wn.fetchSynset("ship.n.1", function(err, synset){
+	//console.log(synset)
 	synset.getHolonyms(null, function(err, data){ console.log(util.inspect(data, null, 3)); });
 })
 

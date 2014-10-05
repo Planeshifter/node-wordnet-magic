@@ -1,5 +1,5 @@
 var wordNet = require("../src/index.js");
-var wn = wordNet();
+var wn = wordNet(null, true);
 
 var dog = wn.fetchSynset("dog.n.1");
 
