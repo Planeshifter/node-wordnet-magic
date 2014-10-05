@@ -1,5 +1,5 @@
 var wordNet = require("../src/index.js");
-var wn = wordNet();
+var wn = wordNet(null,true);
 
 // using callbacks
 
@@ -17,6 +17,7 @@ bank.getSynsets().then(function(synsetArray){
 	console.log(String(synsetArray[3]));
 	console.log("The sample sentences are:");
 	synsetArray[3].getExamples().each(function(data){
+		console.log("Print..")
 		wn.print(data);
 	});
 });
