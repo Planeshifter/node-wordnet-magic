@@ -70,17 +70,31 @@ function makeWordNet(input_path, preload){
 	preload ? wn.preload = preload : wn.preload = false;
 
 	if (wn.preload === true){
-		wn.SAMPLES = db.allAsync("SELECT * FROM samples");
+		wn.SAMPLES = db.allAsync("SELECT * FROM samples").then(function(d){
+			return _.groupBy(d, "synsetid");
+		});
 		wn.SEMLINKS = db.allAsync("SELECT synset1id, synset2id, linkid FROM semlinks");
+
+		wn.SEMLINKS.HYPERNYMS = db.allAsync("SELECT synset1id, synset2id, linkid FROM semlinks WHERE linkid = 1").then(function(d){
+			return _.groupBy(d, "synset1id");
+		});;
+
+		wn.SEMLINKS.SISTERS = db.allAsync("SELECT synset1id, synset2id, linkid FROM semlinks WHERE linkid = 1").then(function(d){
+			return _.groupBy(d, "synset2id");
+		});;
 
 		var long_query = "SELECT s.synsetid AS synsetid, s.definition AS definition, s.pos AS pos, s.lemma AS lemma, "
 											+ "s.sensenum AS sensenum, l.lexdomainname AS lexdomain "
 		 									+"FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid";
-		wn.WORDSxSENSESxSYNSETSxLEXDOMAINS = db.allAsync(long_query);
+		wn.WORDSxSENSESxSYNSETSxLEXDOMAINS = db.allAsync(long_query).then(function(d){
+			return _.groupBy(d, "lemma");
+		});
 
  		var synXlex_query = "SELECT ss.synsetid AS synsetid, ss.pos AS pos, ld.lexdomainname AS lexdomain, ss.definition AS definition";
 		synXlex_query += " FROM synsets AS ss INNER JOIN lexdomains AS ld ON ld.lexdomainid = ss.lexdomainid";
-		wn.SYNSETSxLEXDOMAINS = db.allAsync(synXlex_query);
+		wn.SYNSETSxLEXDOMAINS = db.allAsync(synXlex_query).then(function(d){
+			return _.indexBy(d, "synsetid");
+		});
 	}
 
 	wn.MORPHY_SUBSTITUTIONS = {
@@ -291,8 +305,8 @@ function makeWordNet(input_path, preload){
 						   $lemma: data,
 						 });
 				} else {
-					ret = wn.WORDSxSENSESxSYNSETSxLEXDOMAINS.filter(function(e){
-						return e.lemma === data;
+					ret = wn.WORDSxSENSESxSYNSETSxLEXDOMAINS.then(function(d){
+						return d[data];
 					});
 				}
 			break;
@@ -305,8 +319,13 @@ function makeWordNet(input_path, preload){
 					   $pos: self.part_of_speech
 					 });
 				} else {
-					ret = wn.WORDSxSENSESxSYNSETSxLEXDOMAINS.filter(function(e){
-						return e.lemma === data && e.pos === self.part_of_speech;
+					ret = wn.WORDSxSENSESxSYNSETSxLEXDOMAINS.then(function(d){
+						var candidateSet = d[data];
+						var res;
+						for (var i = 0; i < candidateSet.length; i++){
+							if (candidateSet[i].pos = self.part_of_speech) res.push(candidateSet[i])
+						}
+						return res;
 					});
 				}
 			}
@@ -389,9 +408,7 @@ function makeWordNet(input_path, preload){
 				  });
 				} else {
 					ret = wn.SYNSETSxLEXDOMAINS.then(function(returnSet){
-						return returnSet.filter(function(e){
-							return e.synsetid === data.synsetid;
-						})[0];
+						return returnSet[synsetid];
 					});
 				}
 				return ret;
@@ -424,10 +441,17 @@ function makeWordNet(input_path, preload){
 		    $sensenum: inputs[2]
 		   });
 	  } else {
-	  	ret = wn.WORDSxSENSESxSYNSETSxLEXDOMAINS.then(function(data){
-	  		return data.filter(function(e){
-	  			return e.lemma == inputs[0] && e.pos == inputs[1] && e.sensenum == String(inputs[2]);
-	  		})[0];
+	  	ret = wn.WORDSxSENSESxSYNSETSxLEXDOMAINS.then(function(d){
+	  		var search_lemma = inputs[0];
+	  		var res;
+	  		var candidateSet = d[search_lemma];
+	  		for (var i = 0; i < candidateSet.length; i++)
+	  		{
+	  			if (candidateSet[i].pos == inputs[1] && candidateSet[i].sensenum == inputs[2]){
+	  				res = candidateSet[i];
+	  			}
+	  		}
+	  		return res;
 	  	});
 	  }
 
@@ -744,14 +768,9 @@ function makeWordNet(input_path, preload){
 					$synset2id: data.synsetid
 				});
 			} else {
-				arr = wn.SEMLINKS.then(function(resultSet){
-					return resultSet.filter(function(e){
-						return e.synset2id == data.synsetid && e.linkid == 1;
-					});
-				})
-				arr.then(console.log)
-				console.log("hallo")
-			}
+				arr = wn.SEMLINKS.SISTERS.then(function(resultSet){
+					return resultSet[data.synsetid] || [];
+				});			}
 			arr = arr.map(function(data){
 				var obj = {};
 				obj.synsetid = data.synset1id;
@@ -917,15 +936,16 @@ function makeWordNet(input_path, preload){
 				$synset1id: synsetid
 			});
 		} else {
-			arr = wn.SEMLINKS.filter(function(e){
-				return e.synset1id === synsetid && e.linkid === 1;
+			arr = wn.SEMLINKS.HYPERNYMS.then(function(e){
+				return e[synsetid] || [];
 			});
 		}
-		return arr.map(function(data){
+		var ret = arr.map(function(d){
 			var obj = {};
-			obj.synsetid = data.synset2id;
+			obj.synsetid = d.synset2id;
 			return _findSynsetDefFromId(obj);
 		});
+		return ret;
 	}
 
 	function _findSamplesArray(synsetid){
@@ -936,11 +956,8 @@ function makeWordNet(input_path, preload){
 	  });
 		}
 		else {
-			var ret = wn.SAMPLES.then(function(data){
-				relevant_examples =  data.filter(function(e){
-					return e.synsetid === synsetid;
-				});
-				return relevant_examples;
+			var ret = wn.SAMPLES.then(function(d){
+				return d[synsetid];
 			});
 			return ret;
 		}
@@ -973,11 +990,10 @@ function makeWordNet(input_path, preload){
 		  });
 		} else {
 			ret = wn.SYNSETSxLEXDOMAINS.then(function(returnSet){
-				return returnSet.filter(function(e){
-					return e.synsetid === data.synsetid;
-				})[0];
+				return returnSet[data.synsetid];
 			});
 		}
+		//ret.then(console.log)
 		return ret;
 	};
 

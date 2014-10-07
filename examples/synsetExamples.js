@@ -21,4 +21,3 @@ bank.getSynsets().then(function(synsetArray){
 		wn.print(data);
 	});
 });
-
