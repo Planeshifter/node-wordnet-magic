@@ -290,7 +290,7 @@ function makeWordNet(input_path, preload){
 	  constructor: wn.Word,
 	  getSynsets: function(callback){
 		var self = this;
-		var ret;
+		var ret, query;
 
 		self.part_of_speech = self.part_of_speech || null;
 
@@ -298,7 +298,7 @@ function makeWordNet(input_path, preload){
 			switch(self.part_of_speech){
 			case null:
 				if(!wn.preload){
-					var query = "SELECT s.synsetid AS synsetid, s.definition AS definition, s.pos AS pos, l.lexdomainname AS lexdomain FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid";
+					query = "SELECT s.synsetid AS synsetid, s.definition AS definition, s.pos AS pos, l.lexdomainname AS lexdomain FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid";
 					query += " WHERE s.lemma = $lemma ORDER BY s.pos, s.sensenum";
 					ret =  db.allAsync(query,{
 						   $lemma: data,
@@ -311,19 +311,20 @@ function makeWordNet(input_path, preload){
 			break;
 			default:
 				if (!wn.preload){
-					var query = "SELECT s.synsetid AS synsetid, s.definition AS definition, s.pos AS pos, l.lexdomainname AS lexdomain FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid";
+					query = "SELECT s.synsetid AS synsetid, s.definition AS definition, s.pos AS pos, l.lexdomainname AS lexdomain FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid";
 					query += " WHERE s.pos = $pos AND s.lemma = $lemma ORDER BY s.sensenum";
-				  var ret =  db.allAsync(query,{
+				  ret =  db.allAsync(query,{
 					   $lemma: data,
 					   $pos: self.part_of_speech
 					 });
 				} else {
 					ret = wn.WORDSxSENSESxSYNSETSxLEXDOMAINS.then(function(d){
 						var candidateSet = d[data];
-						var res;
+						var res = [];
 						for (var i = 0; i < candidateSet.length; i++){
-							if (candidateSet[i].pos === self.part_of_speech){
-                res.push(candidateSet[i]); }
+							if (candidateSet[i].pos == self.part_of_speech){
+                res.push(candidateSet[i]);
+              }
 						}
 						return res;
 					});
