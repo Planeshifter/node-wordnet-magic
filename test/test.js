@@ -1,5 +1,5 @@
 var assert = require("assert");
-var wordNet = require('../src/index.js');	
+var wordNet = require('../src/index.js')();
 
 describe('wordNet', function () {
 	  describe('Word', function () {
