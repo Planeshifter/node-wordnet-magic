@@ -8,8 +8,8 @@ describe('wordNet', function () {
 			  word = new wordNet.Word("king");
 			  assert(word instanceof wordNet.Word);
 			  done();
-		      });  
-		     
+		      });
+
 	  });
 	  describe('Synset', function(){
 		 var synsetProm =  new wordNet.Word("bank").getSynsets();
@@ -19,6 +19,6 @@ describe('wordNet', function () {
 					assert(firstSynset instanceof wordNet.Synset);
 				 });
 		 });
-	
+
 	  });
-}); 
+});

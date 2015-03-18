@@ -4,7 +4,9 @@
   "description": "tools for working with Princeton's lexical database WordNet",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha test"
+    "test": "./node_modules/.bin/mocha",
+    "test-cov": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --dir ./reports/coverage -- -R spec",
+    "coveralls": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --dir ./reports/coveralls/coverage --report lcovonly -- -R spec && cat ./reports/coveralls/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./reports/coveralls"
   },
   "repository": {
     "type": "git",
@@ -27,5 +29,11 @@
     "sqlite3": "^2.2.4",
     "underscore": "^1.6.0",
     "mysql": "~2.4.3"
+  },
+  "devDependencies": {
+    "coveralls": "^2.11.2",
+    "istanbul": "^0.3.8",
+    "jshint": "^2.6.3",
+    "jshint-stylish": "^1.0.1"
   }
 }
