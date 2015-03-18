@@ -5,6 +5,8 @@ node_js:
   - '0.10'
   - 'iojs'
 before_install:
-- npm update -g npm
+  - npm update -g npm
+before_script:
+  - sh data/download.sh
 after_script:
-- npm run coveralls
+  - npm run coveralls
