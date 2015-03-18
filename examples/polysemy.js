@@ -1,5 +1,5 @@
 var wordNet = require("../src/index.js");
-var wn = wordNet(null, true);
+var wn = wordNet(null, false);
 
 var util = require("util");
 

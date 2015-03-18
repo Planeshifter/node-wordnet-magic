@@ -1,24 +1,26 @@
-var assert = require("assert");
-var wordNet = require('../src/index.js');	
+'use strict';
 
-describe('wordNet', function () {
-	  describe('Word', function () {
+var chai = require("chai");
+var chaiAsPromised = require("chai-as-promised");
+var expect = chai.expect;
+chai.use(chaiAsPromised);
+chai.use(require('chai-things'));
+
+var wordNet = require('../src/index.js')();
+
+describe('wordNet', function() {
+	  describe('Word', function tests() {
 		  var word;
-		  it('creates a new word', function (done) {
+		  it('creates a new word', function test(done) {
 			  word = new wordNet.Word("king");
-			  assert(word instanceof wordNet.Word);
+				expect(word).to.be.instanceOf(wordNet.Word);
 			  done();
-		      });
-
+		  });
 	  });
-	  describe('Synset', function(){
-		 var synsetProm =  new wordNet.Word("bank").getSynsets();
-		 synsetProm.then(function(data){
-			 it('retrieves synsets for specific word',function(done){
-					var firstSynset = data[0];
-					assert(firstSynset instanceof wordNet.Synset);
-				 });
-		 });
-
-	  });
+	  describe('Synset', function tests(){
+			var synsetProm =  new wordNet.Word("bank").getSynsets();
+			it('retrieves a synset array for aspecific word', function test() {
+				expect(synsetProm).to.eventually.be.instanceOf(Array);
+			});
+		});
 });
