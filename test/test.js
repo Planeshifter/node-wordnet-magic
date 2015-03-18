@@ -18,9 +18,9 @@ describe('wordNet', function() {
 		  });
 	  });
 	  describe('Synset', function tests(){
-			var synsetProm =  new wordNet.Word("bank").getSynsets();
-			it('retrieves a synset array for aspecific word', function test() {
-				expect(synsetProm).to.eventually.be.instanceOf(Array);
-			});
-		});
+		  var synsetProm =  new wordNet.Word("bank").getSynsets();
+		  it('retrieves a synset array for aspecific word', function test() {
+			  expect(synsetProm).to.eventually.be.instanceOf(Array);
+		  });
+	  });
 });
