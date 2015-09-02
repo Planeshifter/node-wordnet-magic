@@ -1,3 +1,5 @@
+'use strict';
+
 var wordNet = require("../src/index.js");
 var wn = wordNet(null, false);
 
@@ -14,5 +16,7 @@ dog.getSynsets().then(function(synsetArray){
 */
 
 wn.fetchSynset("queen.n.7", function(err, synset){
-	synset.getSisterTerms(function(err, data){ console.log(util.inspect(data, null, 5)) });
+	synset.getSisterTerms(function(err, data){
+		console.log(util.inspect(data, null, 5))
+	});
 })

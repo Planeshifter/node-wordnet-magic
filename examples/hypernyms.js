@@ -1,3 +1,5 @@
+'use strict';
+
 var wordNet = require("../src/index.js");
 var wn = wordNet(null, true);
 

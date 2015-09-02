@@ -1,3 +1,5 @@
+'use strict';
+
 var wordNet = require("../src/index.js");
 var wn = wordNet(null, true);
 
@@ -19,6 +21,8 @@ wn.isAdjective("filthy").then(console.log);
 
 wn.isAdverb("helpfully").then(console.log);
 
-wn.isNoun("callback", function(err, data){ console.log(data)});
+wn.isNoun("callback", function(err, data){
+	console.log(data);
+});
 
 wn.isNoun("promise").then(console.log);

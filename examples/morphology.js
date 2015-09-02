@@ -1,3 +1,5 @@
+'use strict';
+
 var wordNet = require("../src/index.js");
 var wn = wordNet();
 
@@ -5,7 +7,7 @@ var wn = wordNet();
 
 var scare = new wn.Word("scared");
 
-scare.getSynsets().then(wn.print)
+scare.getSynsets().then(wn.print);
 
 
 /*

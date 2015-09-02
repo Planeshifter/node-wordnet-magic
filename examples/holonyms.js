@@ -1,3 +1,4 @@
+'use strict';
 /*
 Source: http://en.wikipedia.org/wiki/Holonymy
 Holonymy defines the relationship between a term denoting the whole and a term denoting a part of,
@@ -37,5 +38,3 @@ wn.fetchSynset("ship.n.1", function(err, synset){
 	//console.log(synset)
 	synset.getHolonyms(null, function(err, data){ console.log(util.inspect(data, null, 3)); });
 })
-
-

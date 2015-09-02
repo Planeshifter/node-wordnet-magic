@@ -1,3 +1,5 @@
+'use strict';
+
 var sqlite3 = require('sqlite3').verbose();
 var util = require('util');
 var Promise = require('bluebird');
@@ -11,14 +13,14 @@ var path = require('path');
 // String
 if (!String.prototype.hasOwnProperty("repeat")){
   String.prototype.repeat = function(num){
-    return new Array( num + 1 ).join( this );
+	return new Array( num + 1 ).join( this );
   };
 }
 
 if (!String.prototype.hasOwnProperty("endsWith")){
   String.prototype.endsWith = function(str){
-    var myRegExp = new RegExp(str + "$");
-    return myRegExp.test(this);
+	var myRegExp = new RegExp(str + "$");
+	return myRegExp.test(this);
   };
 }
 
@@ -35,10 +37,10 @@ if (!Array.prototype.hasOwnProperty("pick")){
 if (!Array.prototype.hasOwnProperty("contains")){
 	Array.prototype.contains = function(elem){
 		for (var q = 0; q < this.length; q++){
-	      if (elem == this[q]) {
-	        return true;
-	      }
-	    }
+		  if (elem == this[q]) {
+			return true;
+		  }
+		}
 		return false;
 	};
 }
@@ -52,7 +54,7 @@ function makeWordNet(input_path, preload){
 	var file =  path.normalize(__dirname + '/../data/sqlite-31.db');
 	var exists = fs.existsSync(file);
 		if (exists){
-  			db = Promise.promisifyAll(new sqlite3.Database(file));
+			  db = Promise.promisifyAll(new sqlite3.Database(file));
 		} else {
 		console.log("Couldn't find file 'sqlite-31.db' in data subdirectory. " +
 			"Please supply the correct path by using .registerDatabase(path), otherwise " +
@@ -67,7 +69,7 @@ function makeWordNet(input_path, preload){
 
 	var wn = {};
 
-	preload ? wn.preload = preload : wn.preload = false;
+	wn.preload = preload ? preload : false;
 
 	if (wn.preload === true){
 		wn.SAMPLES = db.allAsync("SELECT * FROM samples").then(function(d){
@@ -84,13 +86,13 @@ function makeWordNet(input_path, preload){
 		});
 
 		var long_query = "SELECT s.synsetid AS synsetid, s.definition AS definition, s.pos AS pos, s.lemma AS lemma, " +
-      "s.sensenum AS sensenum, l.lexdomainname AS lexdomain " +
-      "FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid";
+	  "s.sensenum AS sensenum, l.lexdomainname AS lexdomain " +
+	  "FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid";
 		wn.WORDSxSENSESxSYNSETSxLEXDOMAINS = db.allAsync(long_query).then(function(d){
 			return _.groupBy(d, "lemma");
 		});
 
- 		var synXlex_query = "SELECT ss.synsetid AS synsetid, ss.pos AS pos, ld.lexdomainname AS lexdomain, ss.definition AS definition";
+		 var synXlex_query = "SELECT ss.synsetid AS synsetid, ss.pos AS pos, ld.lexdomainname AS lexdomain, ss.definition AS definition";
 		synXlex_query += " FROM synsets AS ss INNER JOIN lexdomains AS ld ON ld.lexdomainid = ss.lexdomainid";
 		wn.SYNSETSxLEXDOMAINS = db.allAsync(synXlex_query).then(function(d){
 			return _.indexBy(d, "synsetid");
@@ -99,29 +101,29 @@ function makeWordNet(input_path, preload){
 
 	wn.MORPHY_SUBSTITUTIONS = {
 			  NOUN:
-		      [{ suffix: 's', ending: ''},
-		       { suffix: 'ses', ending: 's'},
-		       { suffix: 'ves', ending: 'f'},
-  			   { suffix: 'xes', ending: 'x'},
-  			   { suffix: 'zes', ending: 'z'},
-  			   { suffix: 'ches', ending: 'ch'},
-  			   { suffix: 'shes', ending: 'sh'},
-  			   { suffix: 'men', ending: 'man'},
-  			   { suffix: 'ies', ending: 'y'}],
+			  [{ suffix: 's', ending: ''},
+			   { suffix: 'ses', ending: 's'},
+			   { suffix: 'ves', ending: 'f'},
+				 { suffix: 'xes', ending: 'x'},
+				 { suffix: 'zes', ending: 'z'},
+				 { suffix: 'ches', ending: 'ch'},
+				 { suffix: 'shes', ending: 'sh'},
+				 { suffix: 'men', ending: 'man'},
+				 { suffix: 'ies', ending: 'y'}],
 			  VERB:
-		      [{ suffix: 's', ending: ''},
-		       { suffix: 'ies', ending: 'y'},
-		       { suffix: 'es', ending: 'e'},
-		       { suffix: 'es', ending: ''},
-		       { suffix: 'ed', ending: 'e'},
-		       { suffix: 'ed', ending: ''},
-		       { suffix: 'ing', ending: 'e'},
-		       { suffix: 'ing', ending: ''}],
+			  [{ suffix: 's', ending: ''},
+			   { suffix: 'ies', ending: 'y'},
+			   { suffix: 'es', ending: 'e'},
+			   { suffix: 'es', ending: ''},
+			   { suffix: 'ed', ending: 'e'},
+			   { suffix: 'ed', ending: ''},
+			   { suffix: 'ing', ending: 'e'},
+			   { suffix: 'ing', ending: ''}],
 			  ADJECTIVE:
-		      [{ suffix: 'er', ending: ''},
-		       { suffix: 'est', ending: ''},
-		       { suffix: 'er', ending: 'e'},
-		       { suffix: 'est', ending: 'e'}]
+			  [{ suffix: 'er', ending: ''},
+			   { suffix: 'est', ending: ''},
+			   { suffix: 'er', ending: 'e'},
+			   { suffix: 'est', ending: 'e'}]
 			};
 
 
@@ -135,63 +137,63 @@ function makeWordNet(input_path, preload){
 		  var arr = ["n","v","a","r","s"];
 		  var resArray = [];
 		  for (var i = 0; i <= 4; i++){
-		    resArray.push(wn.morphyPromise(input_str, arr[i]));
-		    }
-  		return Promise.all(resArray).then(function(data){
-  		  var reducedArray = [];
-  		  for (var i = 0; i < data.length; i++){
-  			  var current = data[i];
-  			  reducedArray.push(current);
-  		  }
-  		  return _.flatten(reducedArray);
-  		});
+			resArray.push(wn.morphyPromise(input_str, arr[i]));
+			}
+		  return Promise.all(resArray).then(function(data){
+			var reducedArray = [];
+			for (var i = 0; i < data.length; i++){
+				var current = data[i];
+				reducedArray.push(current);
+			}
+			return _.flatten(reducedArray);
+		  });
 		}
 
 		var substitutions;
-		switch(pos){
-		  case "n":
-		    substitutions = _.clone(wn.MORPHY_SUBSTITUTIONS.NOUN);
-		  break;
-		  case "v":
-		    substitutions = _.clone(wn.MORPHY_SUBSTITUTIONS.VERB);
-		  break;
-		  case "a":
-		    substitutions = _.clone(wn.MORPHY_SUBSTITUTIONS.ADJECTIVE);
-		  break;
-		  default:
-		    substitutions = [];
+		switch ( pos ) {
+		case "n":
+			substitutions = _.clone(wn.MORPHY_SUBSTITUTIONS.NOUN);
+		break;
+		case "v":
+			substitutions = _.clone(wn.MORPHY_SUBSTITUTIONS.VERB);
+		break;
+		case "a":
+			substitutions = _.clone(wn.MORPHY_SUBSTITUTIONS.ADJECTIVE);
+		break;
+		default:
+			substitutions = [];
 		}
 
 		if (!wn.DICTIONARY){
-		  var query = "SELECT DISTINCT ws.lemma AS lemma, syn.pos AS pos FROM words AS ws LEFT JOIN senses AS sen ON ws.wordid = sen.wordid LEFT JOIN ";
-		  query += "synsets AS syn ON sen.synsetid = syn.synsetid";
-		  wn.DICTIONARY = db.allAsync(query).map(function(elem){
-			    var obj = {};
-			    obj.lemma = elem.lemma;
-			    obj.pos = elem.pos;
+		    var query = "SELECT DISTINCT ws.lemma AS lemma, syn.pos AS pos FROM words AS ws LEFT JOIN senses AS sen ON ws.wordid = sen.wordid LEFT JOIN ";
+		    query += "synsets AS syn ON sen.synsetid = syn.synsetid";
+		    wn.DICTIONARY = db.allAsync(query).map(function(elem){
+				var obj = {};
+				obj.lemma = elem.lemma;
+				obj.pos = elem.pos;
 				return obj;
 			});
 		}
 
 		if (!wn.EXCEPTIONS){
-		  var query2 = "SELECT lemma, morph, pos FROM morphology";
-		  wn.EXCEPTIONS = db.allAsync(query2);
+		    var query2 = "SELECT lemma, morph, pos FROM morphology";
+		    wn.EXCEPTIONS = db.allAsync(query2);
 		}
 
 		var wordsPromise = Promise.join(wn.DICTIONARY, wn.EXCEPTIONS, function(dictionary, exceptions){
 
 			function rulesOfDetachment(word, substitutions){
-			  var result = [];
+			    var result = [];
 
-			  dictionary.filter(function(elem){
-				  return elem.lemma === word;
-			  }).forEach(function(elem){
-				if (elem.pos === pos){
-				  var obj = new wn.Word(elem.lemma);
-				  obj.part_of_speech = elem.pos;
-			      result.push(obj);
-				}
-      });
+			    dictionary.filter(function(elem){
+				    return elem.lemma === word;
+			    }).forEach(function(elem){
+				    if (elem.pos === pos){
+				        var obj = new wn.Word(elem.lemma);
+				        obj.part_of_speech = elem.pos;
+				        result.push(obj);
+				    }
+	            });
 
 			  for (var i = 0; i < substitutions.length; i++){
 
@@ -202,7 +204,7 @@ function makeWordNet(input_path, preload){
 					  var new_word = word.substring(0, word.length - suffix.length) + new_ending;
 					  substitutions.splice(i,1);
 					  if (new_word.endsWith("e") && !word.endsWith("e")){
-					    substitutions.push({suffix: 'e', ending:''});
+						substitutions.push({suffix: 'e', ending:''});
 					  }
 					  var recResult = rulesOfDetachment(new_word, substitutions);
 					  Array.isArray(recResult) ? result = result.concat(recResult) : result.push(recResult);
@@ -240,13 +242,13 @@ function makeWordNet(input_path, preload){
 		  return rulesOfDetachment(input_str, substitutions);
 		}
 		});
-	    return wordsPromise;
+		return wordsPromise;
 	};
 
 	wn.isVerb = function(str, callback){
 		var word = wn.morphyPromise(str);
 		var res = word.then(function(data){
-	      var posArray = data.pick("part_of_speech");
+		  var posArray = data.pick("part_of_speech");
 		  return posArray.contains("v");
 		});
 		return res.nodeify(callback);
@@ -255,7 +257,7 @@ function makeWordNet(input_path, preload){
 	wn.isNoun = function(str, callback){
 		var word = wn.morphyPromise(str);
 		var res = word.then(function(data){
-	      var posArray = data.pick("part_of_speech");
+		  var posArray = data.pick("part_of_speech");
 		  return posArray.contains("n");
 		});
 		return res.nodeify(callback);
@@ -264,7 +266,7 @@ function makeWordNet(input_path, preload){
 	wn.isAdjective = function(str, callback){
 		var word = wn.morphyPromise(str);
 		var res = word.then(function(data){
-	      var posArray = data.pick("part_of_speech");
+		  var posArray = data.pick("part_of_speech");
 		  return posArray.contains("a") || posArray.contains("s");
 		});
 		return res.nodeify(callback);
@@ -273,7 +275,7 @@ function makeWordNet(input_path, preload){
 	wn.isAdverb = function(str, callback){
 		var word = wn.morphyPromise(str);
 		var res = word.then(function(data){
-	      var posArray = data.pick("part_of_speech");
+		  var posArray = data.pick("part_of_speech");
 		  return posArray.contains("r");
 		});
 		return res.nodeify(callback);
@@ -282,7 +284,7 @@ function makeWordNet(input_path, preload){
 	wn.Word = function(str, pos){
 	  this.lemma = str;
 	  if (pos){
-	    this.part_of_speech = pos;
+		this.part_of_speech = pos;
 	  }
 	};
 
@@ -313,18 +315,18 @@ function makeWordNet(input_path, preload){
 				if (!wn.preload){
 					query = "SELECT s.synsetid AS synsetid, s.definition AS definition, s.pos AS pos, l.lexdomainname AS lexdomain FROM wordsXsensesXsynsets AS s LEFT JOIN lexdomains AS l ON l.lexdomainid = s.lexdomainid";
 					query += " WHERE s.pos = $pos AND s.lemma = $lemma ORDER BY s.sensenum";
-				  ret =  db.allAsync(query,{
-					   $lemma: data,
-					   $pos: self.part_of_speech
-					 });
+					ret =  db.allAsync(query, {
+						$lemma: data,
+						$pos: self.part_of_speech
+					});
 				} else {
 					ret = wn.WORDSxSENSESxSYNSETSxLEXDOMAINS.then(function(d){
 						var candidateSet = d[data];
 						var res = [];
-						for (var i = 0; i < candidateSet.length; i++){
-							if (candidateSet[i].pos == self.part_of_speech){
-                res.push(candidateSet[i]);
-              }
+						for ( var i = 0; i < candidateSet.length; i++ ) {
+							if ( candidateSet[i].pos === self.part_of_speech ) {
+								res.push(candidateSet[i]);
+							}
 						}
 						return res;
 					});
@@ -339,13 +341,13 @@ function makeWordNet(input_path, preload){
 			  var obj =  _findSynsetDefFromId(data[i]);
 			  SynsetArray.push(obj);
 			}
-		 	return Promise.all(SynsetArray);
-		 	}
+			 return Promise.all(SynsetArray);
+			 }
 
-	    var promise =  _findSynsetsArray(this.lemma).then(_formSynsetsArray).map(_appendLemmas).map(function(item){
-	      return new wn.Synset(item);
-	    });
-	    return promise.nodeify(callback);
+		var promise =  _findSynsetsArray(this.lemma).then(_formSynsetsArray).map(_appendLemmas).map(function(item){
+		  return new wn.Synset(item);
+		});
+		return promise.nodeify(callback);
 	  },
 	  getAntonyms: function(callback){
 
@@ -366,12 +368,12 @@ function makeWordNet(input_path, preload){
 
 		function _findWordId(str){
 		  return db.eachAsync("SELECT wordid FROM words WHERE lemma = $str",{
-		    $str: str
+			$str: str
 		  });
 		}
 
 		function _findSynsetsFromId(data){
-      var query, ret;
+	  var query, ret;
 			switch(self.part_of_speech){
 			case null:
 				query = "SELECT synsetid FROM senses WHERE wordid = $wordid";
@@ -380,9 +382,9 @@ function makeWordNet(input_path, preload){
 					 });
 			break;
 			default:
-			     query = "SELECT senses.synsetid FROM senses INNER JOIN synsets ON synsets.synsetid = senses.synsetid";
+				 query = "SELECT senses.synsetid FROM senses INNER JOIN synsets ON synsets.synsetid = senses.synsetid";
 					 query +=" WHERE wordid = $wordid AND pos = $pos";
-			     ret =  db.allAsync(query,{
+				 ret =  db.allAsync(query,{
 				   $wordid: data.wordid,
 				   $pos: self.part_of_speech
 				 });
@@ -391,7 +393,7 @@ function makeWordNet(input_path, preload){
 		  }
 
 		function _formSynsetsArray(data){
-		    var SynsetArray = [];
+			var SynsetArray = [];
 			for (var i = 0; i < data.length; i++){
 			  var obj =  _findSynsetDefFromId(data[i]);
 			  SynsetArray.push(obj);
@@ -406,7 +408,7 @@ function makeWordNet(input_path, preload){
 				  query += " FROM synsets AS ss INNER JOIN lexdomains AS ld ON ld.lexdomainid = ss.lexdomainid";
 				  query += " WHERE synsetid = $synsetid";
 				  ret = db.eachAsync(query, {
-				    $synsetid: data.synsetid
+					$synsetid: data.synsetid
 				  });
 				} else {
 					ret = wn.SYNSETSxLEXDOMAINS.then(function(returnSet){
@@ -416,8 +418,8 @@ function makeWordNet(input_path, preload){
 				return ret;
 		  }
 
-	    var promise =  _findSynsetsArray(this.lemma).then(_formAntonymsArray);
-	    return promise.nodeify(callback);
+		var promise =  _findSynsetsArray(this.lemma).then(_formAntonymsArray);
+		return promise.nodeify(callback);
 	  },
 	  getPolysemyCount: function(pos, callback){
 		  this.part_of_speech = pos;
@@ -438,27 +440,27 @@ function makeWordNet(input_path, preload){
 		  query += "WHERE s.pos = $pos AND s.lemma = $lemma AND s.sensenum = $sensenum";
 
 		  ret = db.eachAsync(query,{
-		    $lemma: inputs[0],
-		    $pos: inputs[1],
-		    $sensenum: inputs[2]
+			$lemma: inputs[0],
+			$pos: inputs[1],
+			$sensenum: inputs[2]
 		   });
 	  } else {
-	  	ret = wn.WORDSxSENSESxSYNSETSxLEXDOMAINS.then(function(d){
-	  		var search_lemma = inputs[0];
-	  		var res;
-	  		var candidateSet = d[search_lemma];
-	  		for (var i = 0; i < candidateSet.length; i++)
-	  		{
-	  			if (candidateSet[i].pos === inputs[1] && candidateSet[i].sensenum === inputs[2]){
-	  				res = candidateSet[i];
-	  			}
-	  		}
-	  		return res;
-	  	});
+		  ret = wn.WORDSxSENSESxSYNSETSxLEXDOMAINS.then(function(d){
+			  var search_lemma = inputs[0];
+			  var res;
+			  var candidateSet = d[search_lemma];
+			  for (var i = 0; i < candidateSet.length; i++)
+			  {
+				  if (candidateSet[i].pos === inputs[1] && candidateSet[i].sensenum === inputs[2]){
+					  res = candidateSet[i];
+				  }
+			  }
+			  return res;
+		  });
 	  }
 
 	   return ret.then(_appendLemmas).then(function(data){
-	     return new wn.Synset(data);
+		 return new wn.Synset(data);
 	   }).nodeify(callback);
 	};
 
@@ -471,7 +473,7 @@ function makeWordNet(input_path, preload){
 		  this.lexdomain = obj.lexdomain;
 
 		  if(obj.hypernym){
-		    this.hypernym = obj.hypernym;
+			this.hypernym = obj.hypernym;
 		  }
 
 		  if(obj.hyponym){
@@ -595,19 +597,19 @@ function makeWordNet(input_path, preload){
 				  var classification;
 
 				  function _findDomainsArray(synsetid){
-				  	var arr;
-				  	if (!wn.preload){
+					  var arr;
+					  if (!wn.preload){
 							var query = "SELECT synset2id, linkid FROM semlinks WHERE synset1id = $synset1id AND linkid IN (91, 93, 95)";
 							arr = db.allAsync(query, {
 								$synset1id: synsetid
 							});
-				  	} else {
+					  } else {
 							arr = wn.SEMLINKS.then(function(data){
 								return data.filter(function(e){
 									return e.synset1id === synsetid && [91,93,95].contains(e.linkid);
 								});
 							});
-				  	}
+					  }
 
 						return arr.map(function(data){
 							var obj = {};
@@ -615,13 +617,13 @@ function makeWordNet(input_path, preload){
 
 							switch(data.linkid){
 							  case 91:
-							    classification = "topic";
+								classification = "topic";
 							  break;
 							  case 93:
 								classification = "region";
 							  break;
 							  case 95:
-							    classification = "usage";
+								classification = "usage";
 							  break;
 							}
 
@@ -640,8 +642,8 @@ function makeWordNet(input_path, preload){
 				  var classification;
 
 				  function _findDomainTermsArray(synsetid){
-				  	var arr;
-				  	if (!wn.preload){
+					  var arr;
+					  if (!wn.preload){
 							var query = "SELECT synset1id, linkid FROM semlinks WHERE synset2id = $synset2id AND linkid IN (92, 94, 96)";
 							arr = db.allAsync(query, {
 								$synset2id: synsetid
@@ -659,18 +661,18 @@ function makeWordNet(input_path, preload){
 							obj.synsetid = data.synset1id;
 							switch(data.linkid){
 							  case 92:
-							    classification = "topic";
+								classification = "topic";
 							  break;
 							  case 94:
 								classification = "region";
 							  break;
 							  case 96:
-							    classification = "usage";
+								classification = "usage";
 							  break;
 							}
 
 						return _findSynsetDefFromId(obj);
-          });
+		  });
 					}
 
 				  var promise = _findDomainTermsArray(this.synsetid).map(_appendLemmas).map(function(item){
@@ -710,9 +712,9 @@ function makeWordNet(input_path, preload){
 			  var current_depth = depth + 1;
 			  var words;
 			  if(Array.isArray(input.words)){
-			    words = input.words.map(function(item){
-			  	  return item.lemma;
-			    });
+				words = input.words.map(function(item){
+					return item.lemma;
+				});
 			  } else {
 				  words = new Array(input.lemma);
 			  }
@@ -723,31 +725,31 @@ function makeWordNet(input_path, preload){
 			  if(input.hypernym)
 				  {
 				  if(Array.isArray(input.hypernym)){
-				    input.hypernym.forEach(function(elem){
+					input.hypernym.forEach(function(elem){
 					  var space = String(" ");
 					  var times = current_depth * 4;
 					  var spaces = space.repeat(times);
-			          str += "\n" + spaces + getSynsetString(elem, current_depth);
-				    });
+					  str += "\n" + spaces + getSynsetString(elem, current_depth);
+					});
 				  } else{
-				    str += "  " + getSynsetString(input.hypernym, current_depth);
-				    }
+					str += "  " + getSynsetString(input.hypernym, current_depth);
+					}
 				  }
 			  if(input.hyponym)
 			  {
-			    if(Array.isArray(input.hyponym)){
-				    input.hyponym.forEach(function(elem){
+				if(Array.isArray(input.hyponym)){
+					input.hyponym.forEach(function(elem){
 					  var space = String(" ");
 					  var times = current_depth * 4;
 					  var spaces = space.repeat(times);
-			          str += "\n" + spaces + getSynsetString(elem, current_depth);
-				    });
+					  str += "\n" + spaces + getSynsetString(elem, current_depth);
+					});
 			  } else {
-				     str += "  " + getSynsetString(input.hyponym, current_depth);
-				     }
-		      }
+					 str += "  " + getSynsetString(input.hyponym, current_depth);
+					 }
+			  }
 			return str;
-		    }
+			}
 			var synsetString = getSynsetString(obj, 0);
 			console.log(synsetString);
 		break;
@@ -846,17 +848,11 @@ function makeWordNet(input_path, preload){
 		if(type){
 		  type = Array.isArray(type) ? type : new Array(type);
 		  ids = type.map(function(elem){
-			  switch (elem) {
-			  case "part" :
-          return 11;
-			  break;
-			  case "member" :
-          return 13;
-			  break;
-			  case "substance" :
-          return 15;
-			  break;
-			  }
+			switch (elem) {
+			case "part" : return 11;
+			case "member" : return 13;
+			case "substance" : return 15;
+			}
 		  });
 		  linkid = "IN (" + ids.join(",") + ")";
 		} else {
@@ -877,7 +873,6 @@ function makeWordNet(input_path, preload){
 						return e.synset2id === synsetid;
 					}
 				});
-				//console.log(ret);
 				return ret;
 			});
 		}
@@ -978,7 +973,7 @@ function makeWordNet(input_path, preload){
 	  var SynsetArray = [];
 	  for (var i = 0; i < data.length; i++){
 		var obj =  _findSynsetDefFromId(data[i]);
-	    SynsetArray.push(obj);
+		SynsetArray.push(obj);
 	  }
 	  return Promise.all(SynsetArray);
 	}
@@ -990,14 +985,13 @@ function makeWordNet(input_path, preload){
 		  query += " FROM synsets AS ss INNER JOIN lexdomains AS ld ON ld.lexdomainid = ss.lexdomainid";
 		  query += " WHERE synsetid = $synsetid";
 		  ret = db.eachAsync(query, {
-		    $synsetid: data.synsetid
+			$synsetid: data.synsetid
 		  });
 		} else {
 			ret = wn.SYNSETSxLEXDOMAINS.then(function(returnSet){
 				return returnSet[data.synsetid];
 			});
 		}
-		//ret.then(console.log)
 		return ret;
 	}
 

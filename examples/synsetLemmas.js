@@ -1,3 +1,5 @@
+'use strict';
+
 var wordNet = require("../src/index.js");
 var wn = wordNet(null, true);
 
@@ -14,5 +16,7 @@ dog.getSynsets().then(function(synsetArray){
 });
 
 wn.fetchSynset("dog.n.1", function(err, synset){
-	synset.getLemmas(function(err, data){ console.log(data) });
-})
+	synset.getLemmas(function(err, data){
+		console.log(data);
+	});
+});

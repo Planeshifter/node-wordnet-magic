@@ -26,18 +26,18 @@
   "homepage": "https://github.com/Planeshifter/node-wordnet-magic",
   "dependencies": {
     "bluebird": "^2.2.2",
-    "mysql": "~2.5.5",
+    "mysql": "^2.0.0",
     "sqlite3": "^3.0.5",
     "underscore": "^1.6.0"
   },
   "devDependencies": {
-    "chai": "^2.1.2",
-    "chai-as-promised": "^4.3.0",
+    "chai": "3.x.x",
+    "chai-as-promised": "5.x.x",
     "chai-things": "^0.2.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.8",
     "jshint": "^2.6.3",
-    "jshint-stylish": "^1.0.1",
-    "mocha": "^2.2.1"
+    "jshint-stylish": "2.x.x",
+    "mocha": "2.x.x"
   }
 }
