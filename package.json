@@ -28,7 +28,8 @@
     "bluebird": "^2.2.2",
     "mysql": "^2.0.0",
     "sqlite3": "^3.0.5",
-    "underscore": "^1.6.0"
+    "underscore": "^1.6.0",
+    "validate.io-array": "^1.0.6"
   },
   "devDependencies": {
     "chai": "3.x.x",
