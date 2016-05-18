@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/Planeshifter/node-wordnet-magic",
   "dependencies": {
-    "bluebird": "^2.2.2",
+    "bluebird": "3.x.x",
     "mysql": "^2.0.0",
     "sqlite3": "^3.0.5",
     "underscore": "^1.6.0",
