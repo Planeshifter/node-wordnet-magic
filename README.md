@@ -3,7 +3,7 @@
 [![Coverage Status][coveralls-image]][coveralls-url]
 [![Dependencies][dependencies-image]][dependencies-url]
 
-node-wordnet-magic
+wordnet-magic
 ==================
 
 > A node.js module for working with Princeton's WordNet lexical database for the English language.
@@ -23,28 +23,28 @@ Currently, the module offers the following features:
 ## Features
 
 - word type detection
-- abilitiy to retrieve hypernyms, synonyms, homonyms, meronyms etc. for a given synset
-- asynchronous module supporting both classical node.js callbacks and promises implemented via Bluebird
+- ability to retrieve hypernyms, synonyms, homonyms, meronyms etc. for a given synset
+- asynchronous module supporting both classical Node.js callbacks and promises implemented via Bluebird
 - implements WordNet's Morphy to find base words of inflected forms
 
 ## Installation & Setup
 
 The module is available through npm via
 
-```
+``` bash
 npm install wordnet-magic
 ```
 
 Inside node, the package can then be loaded as any other module:
 
-```
-var wordNet = require('wordnet-magic');
+``` javascript
+var wordNet = require( 'wordnet-magic' );
 ```
 
 You can then create a connection to the WordNet database by calling the exposed function
 
-```
-var wn = wordNet("insert path", preload);
+``` javascript
+var wn = wordNet( 'insert path', preload );
 ```
 
 The `wordNet` function has two parameters: The first one is the path of the WordNet database in SQLite format, which can be obtained from the URL
@@ -68,9 +68,11 @@ Alternatively, the wordnet-magic package implements promises via the [Bluebird](
 
 The following example demonstrates the use of both callbacks and promises when using the wordnet-magic module:
 
-```
-wn.isNoun("callback", function(err, data){ console.log(data)});
-wn.isNoun("promise").then(console.log);
+``` javascript
+wn.isNoun( 'callback', function( err, data ) {
+	console.log( data );
+});
+wn.isNoun( 'promise' ).then( console.log );
 ```
 
 ## Word
@@ -78,8 +80,8 @@ wn.isNoun("promise").then(console.log);
 The package includes a word class which is a simple wrapper for any user-supplied string
 providing methods for accessing information provided by WordNet about the word. A word is created as follows:
 
-```
-var word = new wn.Word("cat");
+``` javascript
+var word = new wn.Word( 'cat' );
 ```
 
 The constructor accepts as a second argument a part-of-speech type. Hence, if supplied, *pos* must be
@@ -99,66 +101,79 @@ If the word was created by passing the constructor function a part-of-speech typ
 
 ### Methods
 
-#### .getSynsets(callback)
+#### .getSynsets( callback )
 
 Queries WordNet for an array of Synset objects matching the word and passes them to the callback function. If the part-of-speech
 type exists for word owning the method, the search is restricted to only return synsets of said type.
 
 Example:
-```
-var kiss = new wordNet.Word("kiss","v");
-kiss.getSynsets(function(err, data){
-	console.log(util.inspect(data, null, 3));
+``` javascript
+var kiss = new wordNet.Word( 'kiss', 'v' );
+kiss.getSynsets( function( err, data ) {
+	console.log( util.inspect( data, null, 3 ) );
 });
 ```
 
 Output:
-```
-[ { synsetid: 201433863,
-    words:
-     [ { lemma: 'buss' },
-       { lemma: 'kiss' },
-       { lemma: 'osculate' },
-       { lemma: 'snog' } ],
-    definition: 'touch with the lips or press the lips (against
-    someone\'s mouth or other body part)
-    as an expression of love, greeting, etc.',
-    pos: 'v',
-    lexdomain: 'verb.contact' },
-  { synsetid: 201434356,
-    words: [ { lemma: 'kiss' } ],
-    definition: 'touch lightly or gently',
-    pos: 'v',
-    lexdomain: 'verb.contact' } ]
+``` javascript
+[
+	{
+		synsetid: 201433863,
+		words: [
+			{ lemma: 'buss' },
+			{ lemma: 'kiss' },
+			{ lemma: 'osculate' },
+			{ lemma: 'snog' }
+		],
+		definition: 'touch with the lips or press the lips (against someone\'s mouth or other body part) as an expression of love, greeting, etc.',
+		pos: 'v',
+		lexdomain: 'verb.contact'
+	},
+	{
+		synsetid: 201434356,
+		words: [
+			{ lemma: 'kiss' }
+		],
+		definition: 'touch lightly or gently',
+		pos: 'v',
+		lexdomain: 'verb.contact'
+	}
+]
 ```
 
-#### .getAntonyms(callback)
+#### .getAntonyms( callback )
 
 Retrieves an array of objects containing the antonyms (= words opposite in meaning, e.g. black and white) for
 the supplied word and passes it to the supplied callback function. The objects have three keys, the original *lemma*, the
 *synset* for which the antonym relationship exists and the *antonym* itself.
 
 Example:
-```
-var high = new wn.Word("high");
-high.getAntonyms(function(err, antonymArray){
+``` javascript
+var high = new wn.Word( 'high' );
+high.getAntonyms( function( err, antonymArray ) {
 	console.log(antonymArray);
 });
 ```
 
 Output:
-```
-[ { lemma: 'high',
-    antonym: 'low',
-    synset: 'greater than normal in degree or intensity or amount' },
-  { lemma: 'high',
-    antonym: 'low',
-    synset: '(literal meaning) being at or having a relatively great or
-    specific elevation or upward extension
-     (sometimes used in combinations like knee-high\')' },
-  { lemma: 'high',
-    antonym: 'low',
-    synset: 'used of sounds and voices; high in pitch or frequency' } ]
+``` javascript
+[
+	{
+		lemma: 'high',
+		antonym: 'low',
+		synset: 'greater than normal in degree or intensity or amount'
+	},
+	{
+		lemma: 'high',
+		antonym: 'low',
+		synset: '(literal meaning) being at or having a relatively great or specific elevation or upward extension (sometimes used in combinations like knee-high\')'
+	},
+	{
+		lemma: 'high',
+		antonym: 'low',
+		synset: 'used of sounds and voices; high in pitch or frequency'
+	}
+]
 ```
 
 #### .getPolysemyCount(pos, callback)
@@ -167,16 +182,16 @@ Returns the polysemy count (also called familiarity) for the word. This denotes 
 
 Example:
 
-```
-var kiss = new wordNet.Word("kiss","v");
-kiss.getPolysemyCount("v", function(err, data){
-	console.log(data);
+``` javascript
+var kiss = new wordNet.Word( 'kiss', 'v' );
+kiss.getPolysemyCount( 'v', function( err, data ) {
+	console.log( data );
 });
 ```
 
 Output:
 
-```
+``` javascript
 2
 ```
 
@@ -186,7 +201,7 @@ functionality is important insofar as words are stored only in their base form i
 produce bad results. A detailed explanation of the steps Morphy takes to determine the base form can be found in the original documentation:
 [https://wordnet.princeton.edu/wordnet/man/morphy.7WN.html](https://wordnet.princeton.edu/wordnet/man/morphy.7WN.html)
 
-#### wn.morphy(word, pos, callback)
+#### wn.morphy( word, pos, callback )
 Returns the base form for an inflected word to the callback function. As a second argument, the function takes a character denoting the part of speech,
 which can take one of the values *n* for noun, *v* for verb, *a* for adjective, *r* for adverb and *s* for satellite adjective. Internally,
 the function performs different steps depending on the type of the word. If *pos* is not supplied, all five possibilities are checked and the results
@@ -197,15 +212,17 @@ extended by having the word type as an extra key.
 The first is the matching base word itself and the second its word type.
 
 Example:
-```
-wn.morphy("loci", "n" , function(err, data){
-	console.log(data);
-})
+``` javascript
+wn.morphy( 'loci', 'n' , function( err, data ) {
+	console.log( data );
+});
 ```
 
 Output:
-```
-[ { lemma: 'locus', part_of_speech: 'n' } ]
+``` javascript
+[
+	{ lemma: 'locus', part_of_speech: 'n' }
+]
 ```
 
 ## Word type checking
@@ -215,67 +232,67 @@ take as their first argument the word in question and as their second argument a
 first use *morphy* to find the base form of the supplied word and then check whether the returned array of objects from *morphy*
 contains an entry of the word type in question.
 
-#### wn.isNoun(word, callback)
+#### wn.isNoun( word, callback )
 
 Returns *true* if *word* is a noun, *false* otherwise to the supplied callback.
 
 Example:
-```
-wn.isNoun("happy", function(err, data){
-	console.log(data);
+``` javascript
+wn.isNoun( 'happy', function( err, data ) {
+	console.log( data );
 });
 ```
 
 Output:
-```
+``` javascript
 false
 ```
 
-#### wn.isVerb(word, callback)
+#### wn.isVerb( word, callback )
 
 Returns *true* if *word* is a verb, *false* otherwise to the supplied callback.
 
 Example:
-```
-wn.isVerb("kill", function(err, data){
-	console.log(data);
+``` javascript
+wn.isVerb( 'kill', function( err, data ) {
+	console.log( data );
 });
 ```
 
 Output:
-```
+``` javascript
 true
 ```
 
-#### wn.isAdjective(word, callback)
+#### wn.isAdjective( word, callback )
 
 Returns *true* if *word* is a adjective, *false* otherwise to the supplied callback.
 
 Example:
-```
-wn.isAdjective("filthy", function(err, data){
-	console.log(data);
+``` javascript
+wn.isAdjective( 'filthy', function( err, data ) {
+	console.log( data );
 });
 ```
 
 Output:
-```
+``` javascript
 true
 ```
 
-#### wn.isAdverb(word, callback)
+#### wn.isAdverb( word, callback )
 
 Returns *true* if *word* is a adverb, *false* otherwise to the supplied callback.
 
 Example:
-```
-wn.isAdverb("helpfully", function(err, data){
-	console.log(data);
+``` javascript
+wn.isAdverb( 'helpfully', function( err, data ) {
+	console.log( data );
 });
 ```
 
 Output:
-```
+``` javascript
 true
 ```
 
@@ -292,23 +309,25 @@ of the word. In this case, the function fetchSynset(*string*) can be used to ret
 
 Example:
 
-```
-wn.fetchSynset("dog.n.1", function(err, synset){
- console.log(synset);
+``` javascript
+wn.fetchSynset( 'dog.n.1', function( err, synset ) {
+	console.log( synset );
 });
 ```
 
 Output:
-```
-{ synsetid: 102086723,
-  words:
-   [ { lemma: 'canis familiaris' },
-     { lemma: 'dog' },
-     { lemma: 'domestic dog' } ],
-  definition: 'a member of the genus Canis (probably descended from the common wolf)
-  that has been domesticated by man since prehistoric times; occurs in many breeds',
-  pos: 'n',
-  lexdomain: 'noun.animal' }
+``` javascript
+{
+	synsetid: 102086723,
+	words: [
+		{ lemma: 'canis familiaris' },
+		{ lemma: 'dog' },
+		{ lemma: 'domestic dog' }
+	],
+	definition: 'a member of the genus Canis (probably descended from the common wolf) that has been domesticated by man since prehistoric times; occurs in many breeds',
+	pos: 'n',
+	lexdomain: 'noun.animal'
+}
 ```
 
 ### Properties
@@ -349,107 +368,130 @@ creation, emotion, motion, perception, possession, social, stative, weather
 
 A synset object is equipped with the following methods:
 
-#### .getDomains(callback)
+#### .getDomains( callback )
 
 Retrieves the domain the synset belongs to. There are three different types of domain, topic, region and usage, which
 differentiate between topical, geographical and functional relations. The returned array consists of Synsets which have been augmented with this information: they hold an extra property called "domain_type" which indicates which of the three domain types applies.
 
 Example:
 
-```
-wn.fetchSynset("war.n.1").then(function(synset){
-	console.log(synset)
-	synset.getDomains().then(function(domain){
-		console.log(util.inspect(domain, null, 3))
+``` javascript
+wn.fetchSynset( 'war.n.1' ).then( function( synset ) {
+	console.log( synset );
+	synset.getDomains().then( function( domain ) {
+		console.log( util.inspect( domain, null, 3 ) );
 	});
 })
 ```
 
 Output:
 
-```
-[ { synsetid: 108215965,
-    words:
-     [ { lemma: 'armed forces' },
-       { lemma: 'armed services' },
-       { lemma: 'military' },
-       { lemma: 'military machine' },
-       { lemma: 'war machine' } ],
-    definition: 'the military forces of a nation',
-    pos: 'n',
-    lexdomain: 'noun.group',
-    domain_type: 'topic' } ]
+``` javascript
+[
+	{
+		synsetid: 108215965,
+		words: [
+			{ lemma: 'armed forces' },
+			{ lemma: 'armed services' },
+			{ lemma: 'military' },
+			{ lemma: 'military machine' },
+			{ lemma: 'war machine' }
+		],
+		definition: 'the military forces of a nation',
+		pos: 'n',
+		lexdomain: 'noun.group',
+		domain_type: 'topic'
+	}
+]
 ```
 
-#### .getDomainTerms(callback)
+#### .getDomainTerms( callback )
 
 Retrieves all the terms for which the current synset functions as a domain. Again, there are the different types of domain: topic, region and usage. The returned array consists of Synsets which have been augmented with this information: they hold an extra property called "term_type" which indicates which of the three domain types applies.
 
 Example:
 
-```
-wn.fetchSynset("dance.v.2").then(function(synset){
-	synset.getDomainTerms().then(function(domain){
-		console.log(util.inspect(domain, null, 3))
+``` javascript
+wn.fetchSynset( 'dance.v.2' ).then( function( synset ) {
+	synset.getDomainTerms().then( function( domain ) {
+		console.log( util.inspect( domain, null, 3 ) );
 	});
 })
 ```
 
 Output:
 
-```
-[ { synsetid: 100429255,
-    words:
-     [ { lemma: 'dance' },
-       { lemma: 'dancing' },
-       { lemma: 'saltation' },
-       { lemma: 'terpsichore' } ],
-    definition: 'taking a series of rhythmical steps (and movements) in time to music',
-    pos: 'n',
-    lexdomain: 'noun.act',
-    term_type: 'topic' } ]
+``` javascript
+[
+	{
+		synsetid: 100429255,
+		words: [
+			{ lemma: 'dance' },
+			{ lemma: 'dancing' },
+			{ lemma: 'saltation' },
+			{ lemma: 'terpsichore' }
+		],
+		definition: 'taking a series of rhythmical steps (and movements) in time to music',
+		pos: 'n',
+		lexdomain: 'noun.act',
+		term_type: 'topic'
+	}
+]
 ```
 
-#### .getExamples(callback)
+#### .getExamples( callback )
 
 Returns an array of sample sentences for the synset in question.
 
 Example:
 
-```
-wn.fetchSynset("bank.n.1", function(err, synset){
-	synset.getExamples(function(err, data){
-		console.log(data)
+``` javascript
+wn.fetchSynset( 'bank.n.1', function( err, synset ) {
+	synset.getExamples( function( err, data ) {
+		console.log( data );
 	});
 });
 ```
 
 Output:
-```
-[ { synsetid: 109236472,
-    sampleid: 1,
-    sample: 'they pulled the canoe up on the bank' },
-  { synsetid: 109236472,
-    sampleid: 2,
-    sample: 'he sat on the bank of the river and watched the currents' } ]
+
+``` javascript
+[
+	{
+		synsetid: 109236472,
+		sampleid: 1,
+		sample: 'they pulled the canoe up on the bank'
+	},
+	{
+		synsetid: 109236472,
+		sampleid: 2,
+		sample: 'he sat on the bank of the river and watched the currents'
+	}
+]
 ```
 
-#### .getLemmas(callback)
+#### .getLemmas( callback )
 
 Returns an array of *Word* objects which have a sense belonging to the synset.
 
 Example:
-```
-wn.fetchSynset("dog.n.1", function(err, synset){
-	synset.getLemmas(function(err, data){ console.log(data) });
+
+``` javascript
+wn.fetchSynset( 'dog.n.1', function( err, synset ) {
+	synset.getLemmas( function( err, data ) {
+		console.log( data );
+	});
 });
 ```
 
 Output:
-```
-[ { lemma: 'canis familiaris' },
-  { lemma: 'dog' },
-  { lemma: 'domestic dog' } ]
+
+``` javascript
+[
+	{ lemma: 'canis familiaris' },
+	{ lemma: 'dog' },
+	{ lemma: 'domestic dog' }
+]
 ```
 
 #### .getHypernyms(callback)
@@ -457,90 +499,121 @@ Output:
 A hypernym is a synset constitution a semantic field to which many other synsets can belong. This function looks up the direct hypernym of the synset and passes it to the callback function.
 
 Example:
-```
+
+``` javascript
 // the synset king.n.10 is: king - (chess) the weakest but the most important piece
-wn.fetchSynset("king.n.10").then(function(synset){
-	synset.getHypernyms().then(function(hypernym){
-		console.log(util.inspect(hypernym, null, 3));
+wn.fetchSynset( 'king.n.10' ).then( function( synset ) {
+	synset.getHypernyms().then( function( hypernym ) {
+		console.log( util.inspect( hypernym, null, 3 ) );
 	});
 })
 ```
 
 Output:
-```
-[ { synsetid: 103018094,
-    words: [ { lemma: 'chess piece' }, { lemma: 'chessman' } ],
-    definition: 'any of 16 white and 16 black pieces used in playing the game of chess',
-    pos: 'n',
-    lexdomain: 'noun.artifact' } ]
+
+``` javascript
+[
+	{
+		synsetid: 103018094,
+		words: [
+			{ lemma: 'chess piece' },
+			{ lemma: 'chessman' }
+		],
+		definition: 'any of 16 white and 16 black pieces used in playing the game of chess',
+		pos: 'n',
+		lexdomain: 'noun.artifact'
+	}
+]
 ```
 
-#### .getHypernymsTree(callback)
+#### .getHypernymsTree( callback )
 
 In contrast to *.getHypernyms*, this function performs a recursive search to also retrieve the information about the hypernyms of the found hypernyms, yielding a hierarchical tree structure with the synsets who do not have any more hypernyms at the top. The returned array includes the found hypernyms as *Synset* objects, with an additional key named *hypernym* which containing its hypernym, again as an object of class *Synset*.
 
 Example:
 
-```
-wn.fetchSynset("bacteria.n.1", function(err, synset){
-	synset.getHypernymsTree(function(err, data){
-		console.log(util.inspect(data, null, 3));
+``` javascript
+wn.fetchSynset( 'bacteria.n.1', function( err, synset ) {
+	synset.getHypernymsTree( function( err, data ) {
+		console.log( util.inspect( data, null, 3 ) );
 	});
 });
 ```
 
 Output:
 
-```
-[ { synsetid: 101328932,
-    words: [ { lemma: 'micro-organism' }, { lemma: 'microorganism' } ],
-    definition: 'any organism of microscopic size',
-    pos: 'n',
-    lexdomain: 'noun.animal',
-    hypernym:
-     [ { synsetid: 100004475,
-         words: [Object],
-         definition: 'a living thing that has (or can develop) the ability to act or function independently',
-         pos: 'n',
-         lexdomain: 'noun.tops',
-         hypernym: [Object] } ] } ]
+``` javascript
+[
+	{
+		synsetid: 101328932,
+		words: [
+			{ lemma: 'micro-organism' },
+			{ lemma: 'microorganism' }
+		],
+		definition: 'any organism of microscopic size',
+		pos: 'n',
+		lexdomain: 'noun.animal',
+		hypernym: [ {
+			synsetid: 100004475,
+			words: [Object],
+			definition: 'a living thing that has (or can develop) the ability to act or function independently',
+			pos: 'n',
+			lexdomain: 'noun.tops',
+			hypernym: [Object]
+		} ]
+	}
+]
 ```
 
-#### .getHyponyms(callback)
+#### .getHyponyms( callback )
 
 This function collects the hyponyms for the synset, where the hyponym of a synset is defined as a subordinate grouping. In doing so, the synset and its hyponym stand in a type-of relationship with each other. This function retrieves the
 hyponyms of a synset and returns them in array to the callback.
 
 Example:
 
-```
-wn.fetchSynset("american.n.3").then(function(synset){
-	console.log(synset)
-	synset.getHyponyms().then(function(hyponym){
-		console.log(util.inspect(hyponym, null, 3))
+``` javascript
+wn.fetchSynset( 'american.n.3' ).then( function( synset ) {
+	console.log( synset );
+	synset.getHyponyms().then( function( hyponym ) {
+		console.log( util.inspect( hyponym, null, 3 ) );
 	});
 })
 ```
 
 Output:
 
-```
-[ { synsetid: 109729069,
-    words: [ { lemma: 'creole' } ],
-    definition: 'a person of European descent born in the West Indies or Latin America',
-    pos: 'n',
-    lexdomain: 'noun.person' },
-  { synsetid: 109739652,
-    words: [ { lemma: 'latin american' }, { lemma: 'latino' } ],
-    definition: 'a native of Latin America',
-    pos: 'n',
-    lexdomain: 'noun.person' },
-  { synsetid: 109744643,
-    words: [ { lemma: 'north american' } ],
-    definition: 'a native or inhabitant of North America',
-    pos: 'n',
-    lexdomain: 'noun.person' },
-(...)
+``` javascript
+[
+	{
+		synsetid: 109729069,
+		words: [
+			{ lemma: 'creole' }
+		],
+		definition: 'a person of European descent born in the West Indies or Latin America',
+		pos: 'n',
+		lexdomain: 'noun.person'
+	},
+	{
+		synsetid: 109739652,
+		words: [
+			{ lemma: 'latin american' },
+			{ lemma: 'latino' }
+		],
+		definition: 'a native of Latin America',
+		pos: 'n',
+		lexdomain: 'noun.person'
+	},
+	{
+		synsetid: 109744643,
+		words: [
+			{ lemma: 'north american' }
+		],
+		definition: 'a native or inhabitant of North America',
+		pos: 'n',
+		lexdomain: 'noun.person'
+	},
+	(...)
 ]
 ```
 
@@ -550,7 +623,7 @@ Performs a recursive search and returns an array of hyponyms, which are again ju
 
 Example:
 
-```
+``` javascript
 wn.fetchSynset("canadian.n.1").then(function(synset){
 	synset.getHyponymsTree().then(function(hypernym){
 		// only print first element of array to the console
@@ -560,25 +633,35 @@ wn.fetchSynset("canadian.n.1").then(function(synset){
 ```
 
 Output:
-```
-{ synsetid: 109716159,
-  words: [ { lemma: 'french canadian' } ],
-  definition: 'a Canadian descended from early French settlers and whose native language is French',
-  pos: 'n',
-  lexdomain: 'noun.person',
-  hyponym:
-   [ { synsetid: 109696564,
-       words: [ [Object] ],
-       definition: 'an early French settler in the Maritimes',
-       pos: 'n',
-       lexdomain: 'noun.person',
-       hyponym: [ [Object] ] },
-     { synsetid: 109716340,
-       words: [ [Object] ],
-       definition: 'informal term for Canadians in general and French Canadians in particular',
-       pos: 'n',
-       lexdomain: 'noun.person',
-       hyponym: [] } ] }
+
+``` javascript
+{
+	synsetid: 109716159,
+	words: [
+		{ lemma: 'french canadian' }
+	],
+	definition: 'a Canadian descended from early French settlers and whose native language is French',
+	pos: 'n',
+	lexdomain: 'noun.person',
+	hyponym: [
+		{
+			synsetid: 109696564,
+			words: [ [Object] ],
+			definition: 'an early French settler in the Maritimes',
+			pos: 'n',
+			lexdomain: 'noun.person',
+			hyponym: [ [Object] ]
+		},
+		{
+			synsetid: 109716340,
+			words: [ [Object] ],
+			definition: 'informal term for Canadians in general and French Canadians in particular',
+			pos: 'n',
+			lexdomain: 'noun.person',
+			hyponym: []
+		}
+	]
+}
 ```
 
 #### .getHolonyms(type, callback)
@@ -589,27 +672,34 @@ returns all holonyms.
 
 Example:
 
-```
-wn.fetchSynset("feminist.n.1", function(err, synset){
-	synset.getHolonyms("member", function(err, data){ console.log(util.inspect(data, null, 3)); });
-})
+``` javascript
+wn.fetchSynset( 'feminist.n.1', function( err, synset ) {
+	synset.getHolonyms( 'member', function( err, data ) {
+		console.log( util.inspect( data, null, 3 ) );
+	});
+});
 ```
 
 Output:
 
-```
-[ { synsetid: 100802082,
-    words:
-     [ { lemma: 'feminism' },
-       { lemma: 'feminist movement' },
-       { lemma: 'women\'s lib' },
-       { lemma: 'women\'s liberation movement' } ],
-    definition: 'the movement aimed at equal rights for women',
-    pos: 'n',
-    lexdomain: 'noun.act' } ]
+``` javascript
+[
+	{
+		synsetid: 100802082,
+		words: [
+			{ lemma: 'feminism' },
+			{ lemma: 'feminist movement' },
+			{ lemma: 'women\'s lib' },
+			{ lemma: 'women\'s liberation movement' }
+		],
+		definition: 'the movement aimed at equal rights for women',
+		pos: 'n',
+		lexdomain: 'noun.act'
+	}
+]
 ```
 
-#### .getMeronyms(type, callback)
+#### .getMeronyms( type, callback )
 
 Meronyms are the opposite of holonyms, i.e. X is a meronym of Y if X is a part of Y. The function takes as a first argument the type of the meronym
 relationship, which can be either *part*, *member* or *substance* (or an array combining any two of those). If *null* is supplied, the function
@@ -617,7 +707,7 @@ returns all meronyms. The returned object is an array of synsets which are meron
 
 Example:
 
-```
+``` javascript
 wn.fetchSynset("finger.n.1", function(err, synset){
 	synset.getMeronyms("part",function(err, data){
 	  console.log(util.inspect(data, null, 3));
@@ -627,7 +717,7 @@ wn.fetchSynset("finger.n.1", function(err, synset){
 
 Output:
 
-```
+``` javascript
 [ { synsetid: 102443154,
     words: [ { lemma: 'pad' } ],
     definition: 'the fleshy cushion-like underside of an animal\'s foot
@@ -655,7 +745,7 @@ Output:
 
 ```
 
-#### .getSisterTerms(callback)
+#### .getSisterTerms( callback )
 
 Finds all sister terms for the synset in question, that is all other synsets which share a common hypernym. The object
 passed to the supplied callback function is an array consisting of the hypernym synset, which has an additional *hyponym*
@@ -665,7 +755,7 @@ the sister terms as *jack* and *king*. See the example.
 
 Example:
 
-```
+``` javascript
 wn.fetchSynset("queen.n.7", function(err, synset){
 	synset.getSisterTerms(function(err, data){ console.log(util.inspect(data, null, 5)); });
 })
@@ -673,7 +763,7 @@ wn.fetchSynset("queen.n.7", function(err, synset){
 
 Output:
 
-```
+``` javascript
 [ { synsetid: 103318973,
     words:
      [ { lemma: 'court card' },
@@ -700,14 +790,14 @@ Output:
          words: [ { lemma: 'queen' } ] } ] } ]
 ```
 
-#### .causeOf(callback)
+#### .causeOf( callback )
 
 Defined for two verbs X and Y, where X causes the action of Y. The result set is an array consisting of the
 synset(s) which are caused by the synset this method belongs to.
 
 Example:
 
-```
+``` javascript
 wn.fetchSynset("leak.v.1",function(err, synset){
 	synset.causeOf(function(err, data){
 		console.log(data)
@@ -717,7 +807,7 @@ wn.fetchSynset("leak.v.1",function(err, synset){
 
 Output:
 
-```
+``` javascript
 [ { synsetid: 200938019,
     words: [ [Object], [Object], [Object] ],
     definition: 'be released or become known; of news',
@@ -727,17 +817,17 @@ Output:
 
 ### Other Functions
 
-#### wn.print(input)
+#### wn.print( input )
 
 This utility function takes as its input an object of any class from the module and prints the content in a nicely formatted
 way to the terminal. An array of objects can also be supplied.
 
 Example:
-```  
-wn.fetchSynset("fish.n.1").then(function(synsetArray){
-	synsetArray.getHypernymsTree().each(function(hypernym){
-			wn.print(hypernym);
-		})
+``` javascript
+wn.fetchSynset( 'fish.n.1' ).then( function( synsetArray ) {
+	synsetArray.getHypernymsTree().each( function forEach( hypernym ) {
+		wn.print( hypernym );
+	})
 });
 ```
 
