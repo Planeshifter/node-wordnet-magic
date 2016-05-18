@@ -750,44 +750,58 @@ Output:
 Finds all sister terms for the synset in question, that is all other synsets which share a common hypernym. The object
 passed to the supplied callback function is an array consisting of the hypernym synset, which has an additional *hyponym*
 key which holds an array of its hyponyms. For example, in a given deck of cards, the queen is one of three card types bearing a face.
-When asking WordNet to find the sister terms of a queen of cards, it firsts finds its hypernym and then correclty outputs
+When asking WordNet to find the sister terms of a queen of cards, it firsts finds its hypernym and then correctly outputs
 the sister terms as *jack* and *king*. See the example.
 
 Example:
 
 ``` javascript
-wn.fetchSynset("queen.n.7", function(err, synset){
-	synset.getSisterTerms(function(err, data){ console.log(util.inspect(data, null, 5)); });
+wn.fetchSynset( 'queen.n.7', function( err, synset ) {
+	synset.getSisterTerms( function( err, data ) {
+		console.log(util.inspect( data, null, 5 ) );
+	});
 })
 ```
 
 Output:
 
 ``` javascript
-[ { synsetid: 103318973,
-    words:
-     [ { lemma: 'court card' },
-       { lemma: 'face card' },
-       { lemma: 'picture card' } ],
-    definition: 'one of the twelve cards in a deck bearing a picture of a face',
-    pos: 'n',
-    lexdomain: 'noun.artifact',
-    hyponym:
-     [ { synsetid: 103594280,
-         pos: 'n',
-         lexdomain: 'noun.artifact',
-         definition: 'one of four face cards in a deck bearing a picture of a young prince',
-         words: [ { lemma: 'jack' }, { lemma: 'knave' } ] },
-       { synsetid: 103623428,
-         pos: 'n',
-         lexdomain: 'noun.artifact',
-         definition: 'one of the four playing cards in a deck bearing the picture of a king',
-         words: [ { lemma: 'king' } ] },
-       { synsetid: 104039901,
-         pos: 'n',
-         lexdomain: 'noun.artifact',
-         definition: 'one of four face cards in a deck bearing a picture of a queen',
-         words: [ { lemma: 'queen' } ] } ] } ]
+[
+	{
+		synsetid: 103318973,
+		words: [
+			{ lemma: 'court card' },
+			{ lemma: 'face card' },
+			{ lemma: 'picture card' }
+		],
+		definition: 'one of the twelve cards in a deck bearing a picture of a face',
+		pos: 'n',
+		lexdomain: 'noun.artifact',
+		hyponym: [
+			{
+				synsetid: 103594280,
+				pos: 'n',
+				lexdomain: 'noun.artifact',
+				definition: 'one of four face cards in a deck bearing a picture of a young prince',
+				words: [ { lemma: 'jack' }, { lemma: 'knave' } ]
+			},
+			{
+				synsetid: 103623428,
+				pos: 'n',
+				lexdomain: 'noun.artifact',
+				definition: 'one of the four playing cards in a deck bearing the picture of a king',
+				words: [ { lemma: 'king' } ]
+			},
+			{
+				synsetid: 104039901,
+				pos: 'n',
+				lexdomain: 'noun.artifact',
+				definition: 'one of four face cards in a deck bearing a picture of a queen',
+				words: [ { lemma: 'queen' } ]
+			}
+		]
+	}
+]
 ```
 
 #### .causeOf( callback )
