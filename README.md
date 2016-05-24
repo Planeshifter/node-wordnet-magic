@@ -494,7 +494,7 @@ Output:
 ]
 ```
 
-#### .getHypernyms(callback)
+#### .getHypernyms( callback )
 
 A hypernym is a synset constitution a semantic field to which many other synsets can belong. This function looks up the direct hypernym of the synset and passes it to the callback function.
 
@@ -617,7 +617,7 @@ Output:
 ]
 ```
 
-#### .getHyponymsTree(callback)
+#### .getHyponymsTree( callback )
 
 Performs a recursive search and returns an array of hyponyms, which are again just *Synset* objects. However, they additionally possess a field called *hyponym* which includes their own hyponym etc.
 
@@ -664,7 +664,7 @@ Output:
 }
 ```
 
-#### .getHolonyms(type, callback)
+#### .getHolonyms( type, callback )
 
 Returns an array of holonyms for the given synset. Holonyms define the relationship between a part and a whole. Specifically, X is a holonym of Y if the latter is a part of X, for example an arm is part of a human being.
 The function takes as a first argument the type of the holonym relationship, which can be either *part*, *member* or *substance* (or an array combining any two of those). If *null* is supplied, the function
