@@ -1,6 +1,6 @@
 {
   "name": "wordnet-magic",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "tools for working with Princeton's lexical database WordNet",
   "main": "./lib/index.js",
   "scripts": {
@@ -27,18 +27,18 @@
   "dependencies": {
     "bluebird": "3.x.x",
     "mysql": "^2.0.0",
-    "sqlite3": "^3.0.5",
+    "sqlite3": "^4.0.2",
     "underscore": "^1.6.0",
     "validate.io-array": "^1.0.6"
   },
   "devDependencies": {
-    "chai": "3.x.x",
-    "chai-as-promised": "5.x.x",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
     "chai-things": "^0.2.0",
-    "coveralls": "^2.11.2",
-    "istanbul": "^0.3.8",
-    "jshint": "^2.6.3",
+    "coveralls": "^3.0.2",
+    "istanbul": "^0.4.5",
+    "jshint": "^2.9.5",
     "jshint-stylish": "2.x.x",
-    "mocha": "2.x.x"
+    "mocha": "^5.2.0"
   }
 }
